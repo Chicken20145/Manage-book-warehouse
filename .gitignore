@@ -4,8 +4,6 @@ venv/
 # Bỏ qua file bảo mật chứa SECRET_KEY
 .env
 
-# Bỏ qua database local của bạn (để các bạn khác tự tạo database trống trên máy họ)
-db.sqlite3
 
 # Bỏ qua các file cache tự sinh của Python
 __pycache__/

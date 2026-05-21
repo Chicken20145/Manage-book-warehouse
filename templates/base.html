@@ -1,0 +1,40 @@
+﻿
+{% extends 'base.html' %}
+
+{% block title %}Bảng Điều Khiển Quản Trị{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold">Tổng quan hệ thống</h2>
+        <p class="text-muted">Vai trò hiện tại: <span class="badge bg-success">{{ role }}</span></p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100 bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">📚 Tổng số sách trong kho</h5>
+                <h2 class="display-4 fw-bold mt-3">1,250</h2> </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100 bg-warning text-dark">
+            <div class="card-body">
+                <h5 class="card-title">🔄 Sách đang cho mượn</h5>
+                <h2 class="display-4 fw-bold mt-3">45</h2> </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100 bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">👥 Tổng số sinh viên</h5>
+                <h2 class="display-4 fw-bold mt-3">320</h2>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
