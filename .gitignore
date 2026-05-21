@@ -1,0 +1,14 @@
+﻿Môi trường ảo
+venv/
+env/
+
+Python
+pycache/
+*.py[cod]
+*$py.class
+
+Database và file cấu hình
+db.sqlite3
+.env
+
+.vs/
