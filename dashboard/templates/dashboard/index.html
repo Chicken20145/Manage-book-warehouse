@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Tổng quan | Book Warehouse{% endblock %}
+{% block page_heading %}Tổng quan hệ thống{% endblock %}
+
+{% block content %}
+<section class="page-hero p-4 p-lg-5 mb-4">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-8">
+            <span class="status-pill">Vai trò: {{ role }}</span>
+            <h1 class="display-6 fw-bold mt-3 mb-3">Không gian điều phối kho sách và phân quyền người dùng.</h1>
+            <p class="lead text-muted mb-0">Bạn đang đăng nhập với quyền {{ role }}. Các phân hệ Catalog, Circulation và Dashboard có thể kế thừa layout này để phát triển tiếp.</p>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel-card p-4">
+                <div class="text-muted small text-uppercase fw-bold">Nhiệm vụ gần nhất</div>
+                <ul class="list-unstyled mt-3 mb-0 d-grid gap-2">
+                    {% for action in actions %}
+                        <li class="d-flex gap-2"><span class="text-success fw-bold">OK</span><span>{{ action }}</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-4">
+    {% for card in cards %}
+        <div class="col-md-4">
+            <article class="metric-card tone-{{ card.tone }} p-4 h-100">
+                <div class="text-muted fw-semibold">{{ card.label }}</div>
+                <div class="metric-value my-3">{{ card.value }}</div>
+                <p class="text-muted mb-0">{{ card.note }}</p>
+            </article>
+        </div>
+    {% endfor %}
+</section>
+
+<section class="panel-card p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
+        <div>
+            <h2 class="h5 fw-bold mb-1">Trạng thái tích hợp nhóm</h2>
+            <p class="text-muted mb-0">Các bạn còn lại có thể nối model, view và template vào các module dưới đây.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="{% url 'book-list' %}">Catalog</a>
+            <a class="btn btn-brand" href="{% url 'loan-list' %}">Mượn trả</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
