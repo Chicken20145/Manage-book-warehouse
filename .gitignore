@@ -1,14 +1,13 @@
-﻿Môi trường ảo
+﻿# Bỏ qua môi trường ảo (không bao giờ push cái này)
 venv/
-env/
 
-Python
-pycache/
-*.py[cod]
-*$py.class
-
-Database và file cấu hình
-db.sqlite3
+# Bỏ qua file bảo mật chứa SECRET_KEY
 .env
 
+
+# Bỏ qua các file cache tự sinh của Python
+__pycache__/
+*.pyc
+
+# Bỏ qua bộ nhớ tạm của Visual Studio
 .vs/
