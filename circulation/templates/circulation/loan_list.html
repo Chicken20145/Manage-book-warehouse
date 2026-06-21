@@ -12,10 +12,31 @@
             <p class="text-muted mb-0">Trang mẫu để nhóm Circulation nối dữ liệu phiếu mượn/trả thật.</p>
         </div>
         {% if user.role == 'ADMIN' or user.role == 'LIBRARIAN' %}
-            <button class="btn btn-brand" type="button">Tạo phiếu mượn</button>
+            <button class="btn btn-brand" type="button" data-bs-toggle="collapse" data-bs-target="#borrowForm">
+                Tạo phiếu mượn
+            </button>
         {% endif %}
     </div>
 </section>
+
+{% if user.role == 'ADMIN' or user.role == 'LIBRARIAN' %}
+<section class="data-card p-4 mb-4 collapse" id="borrowForm">
+    <form method="post" action="{% url 'borrow-create' %}" class="row g-3">
+        {% csrf_token %}
+        <div class="col-md-6">{{ borrow_form.user.label_tag }}{{ borrow_form.user }}</div>
+        <div class="col-md-3">{{ borrow_form.borrow_date.label_tag }}{{ borrow_form.borrow_date }}</div>
+        <div class="col-md-3">{{ borrow_form.due_date.label_tag }}{{ borrow_form.due_date }}</div>
+        <div class="col-12">{{ borrow_form.notes.label_tag }}{{ borrow_form.notes }}</div>
+        <div class="col-12">
+            <div class="mb-2">{{ borrow_form.books.label_tag }}</div>
+            {{ borrow_form.books }}
+        </div>
+        <div class="col-12">
+            <button class="btn btn-brand" type="submit">Lưu phiếu mượn</button>
+        </div>
+    </form>
+</section>
+{% endif %}
 
 <section class="data-card p-0 overflow-hidden">
     <div class="table-responsive">
@@ -26,15 +47,35 @@
                     <th>Sách</th>
                     <th>Hạn trả</th>
                     <th>Trạng thái</th>
+                    <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 {% for loan in loans %}
                     <tr>
-                        <td class="fw-semibold">{{ loan.student }}</td>
-                        <td>{{ loan.book }}</td>
-                        <td>{{ loan.due }}</td>
+                        <td class="fw-semibold">{{ loan.user.username }}</td>
+                        <td>
+                            {% for item in loan.items.all %}
+                                <div>{{ item.book.title }} x{{ item.quantity }}</div>
+                            {% endfor %}
+                        </td>
+                        <td>{{ loan.due_date }}</td>
                         <td><span class="status-pill">{{ loan.status }}</span></td>
+                        <td>
+                            {% if user.role == 'ADMIN' or user.role == 'LIBRARIAN' %}
+                                <div class="d-flex gap-2">
+                                    <form method="post" action="{% url 'borrow-confirm' loan.id %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-outline-primary" type="submit">Xác nhận mượn</button>
+                                    </form>
+                                    <form method="post" action="{% url 'return-confirm' loan.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="returned_date" value="{% now 'Y-m-d' %}">
+                                        <button class="btn btn-sm btn-outline-success" type="submit">Xác nhận trả</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

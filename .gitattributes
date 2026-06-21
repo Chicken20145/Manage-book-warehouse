@@ -1,0 +1,13 @@
+# Tự động phát hiện text và chuẩn hóa thành LF khi commit
+* text=auto
+
+# Đảm bảo các file Python luôn dùng LF
+*.py text eol=lf
+
+# HTML templates cũng nên dùng LF để nhất quán
+*.html text eol=lf
+
+# Các file nhị phân không nên bị thay đổi
+*.png binary
+*.jpg binary
+*.db binary
