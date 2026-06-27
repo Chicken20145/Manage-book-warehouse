@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
@@ -17,6 +18,7 @@ def _is_staff_librarian(user):
     return getattr(user, 'role', None) in {'ADMIN', 'LIBRARIAN'}
 
 
+@login_required
 def loan_list_view(request):
     if request.user.is_authenticated and not _is_staff_librarian(request.user):
         borrowings = Borrowing.objects.filter(user=request.user).select_related('user', 'confirmed_by').prefetch_related('items__book')
