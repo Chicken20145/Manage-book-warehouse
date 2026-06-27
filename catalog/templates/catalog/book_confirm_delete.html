@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Xóa sách | Book Warehouse{% endblock %}
+{% block page_heading %}Xác nhận xóa{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 500px;">
+    <div class="card border-danger mb-3 shadow-sm">
+        <div class="card-header bg-danger text-white fw-bold">Cảnh báo: Hành động không thể hoàn tác</div>
+        <div class="card-body text-danger p-4 text-center">
+            <h5 class="card-title mb-4">Bạn có chắc chắn muốn xóa cuốn sách này khỏi kho?</h5>
+            
+            <div class="p-3 bg-light rounded text-dark text-start mb-4 border">
+                <p class="mb-1"><strong>Mã sách:</strong> {{ book.code }}</p>
+                <p class="mb-1"><strong>Tên sách:</strong> {{ book.title }}</p>
+                <p class="mb-0"><strong>Tác giả:</strong> {{ book.author|default:"-" }}</p>
+            </div>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'book-list' %}" class="btn btn-secondary px-4">Giữ lại (Hủy)</a>
+                    <button type="submit" class="btn btn-danger px-4">Đồng ý Xóa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

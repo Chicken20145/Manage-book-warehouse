@@ -10,9 +10,17 @@
             <span class="status-pill">Catalog</span>
             <h1 class="h3 fw-bold mt-3 mb-2">Quản lý sách trong kho</h1>
             <p class="text-muted mb-0">Danh sách sách được lấy trực tiếp từ model `Book`.</p>
+            
+            <form method="GET" action="" class="mt-3">
+                <div class="input-group" style="max-width: 400px;">
+                    <input type="text" name="q" class="form-control" placeholder="Tìm tên, tác giả, mã sách..." value="{{ query }}">
+                    <button class="btn btn-outline-secondary" type="submit">Tìm kiếm</button>
+                </div>
+            </form>
         </div>
-        {% if user.role == 'ADMIN' or user.role == 'LIBRARIAN' %}
-            <button class="btn btn-brand" type="button">Thêm sách</button>
+        
+        {% if user.role == 'ADMIN' or user.role == 'LIBRARIAN' or user.is_superuser %}
+            <a href="{% url 'book-create' %}" class="btn btn-brand">Thêm sách</a>
         {% endif %}
     </div>
 </section>
@@ -28,6 +36,9 @@
                     <th>Tồn kho</th>
                     <th>Khả dụng</th>
                     <th>Trạng thái</th>
+                    {% if user.role == 'ADMIN' or user.role == 'LIBRARIAN' or user.is_superuser %}
+                    <th>Hành động</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -47,10 +58,16 @@
                                 {% endif %}
                             </span>
                         </td>
+                        {% if user.role == 'ADMIN' or user.role == 'LIBRARIAN' or user.is_superuser %}
+                        <td>
+                            <a href="{% url 'book-update' book.pk %}" class="btn btn-sm btn-brand me-1">Sửa</a>
+                            <a href="{% url 'book-delete' book.pk %}" class="btn btn-sm btn-danger">Xóa</a>
+                        </td>
+                        {% endif %}
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">Chưa có sách nào trong kho.</td>
+                        <td colspan="7" class="text-center text-muted py-4">Chưa có sách nào trong kho.</td>
                     </tr>
                 {% endfor %}
             </tbody>
