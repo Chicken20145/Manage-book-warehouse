@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} | Book Warehouse{% endblock %}
+{% block page_heading %}{{ action }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h2 class="h4 mb-4 text-center">{{ action }}</h2>
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                {{ form.as_p }}
+                
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a href="{% url 'book-list' %}" class="btn btn-secondary">Hủy</a>
+                    <button type="submit" class="btn btn-brand">Lưu lại</button>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
