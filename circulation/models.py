@@ -50,6 +50,12 @@ class Borrowing(models.Model):
         return late_days * 1000
 
     @property
+    def current_fine(self):
+        if self.status == self.Status.RETURNED:
+            return self.fine
+        return self.calculate_fine()
+
+    @property
     def is_overdue(self):
         return self.status == self.Status.OVERDUE
 

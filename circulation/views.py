@@ -25,6 +25,12 @@ def loan_list_view(request):
     else:
         borrowings = Borrowing.objects.select_related('user', 'confirmed_by').prefetch_related('items__book')
 
+    fine_status = request.GET.get('fine_status', '').strip().lower()
+    if fine_status == 'unpaid':
+        borrowings = borrowings.filter(fine__gt=0, is_fine_paid=False)
+    elif fine_status == 'paid':
+        borrowings = borrowings.filter(is_fine_paid=True)
+
     today = timezone.localdate()
     Borrowing.objects.filter(status=Borrowing.Status.BORROWED, due_date__lt=today, returned_date__isnull=True).update(status=Borrowing.Status.OVERDUE)
     for borrowing in borrowings:
@@ -35,6 +41,7 @@ def loan_list_view(request):
         'loans': borrowings,
         'borrow_form': BorrowingForm(),
         'return_form': ReturnForm(),
+        'fine_status': fine_status,
     }
     return render(request, 'circulation/loan_list.html', context)
 
@@ -66,7 +73,15 @@ def create_borrowing_view(request):
                 return redirect('loan-list')
             messages.success(request, 'Đã tạo phiếu mượn.')
             return redirect('loan-list')
-        messages.error(request, 'Không thể tạo phiếu mượn. Vui lòng kiểm tra lại dữ liệu.')
+        error_messages = []
+        for field, errors in form.errors.items():
+            label = form.fields[field].label if field in form.fields else field
+            for error in errors:
+                error_messages.append(f'{label}: {error}')
+        messages.error(
+            request,
+            'Không thể tạo phiếu mượn. ' + (' | '.join(error_messages) if error_messages else 'Vui lòng kiểm tra lại dữ liệu.'),
+        )
     return redirect('loan-list')
 
 
@@ -105,4 +120,14 @@ def confirm_borrowing_view(request, borrowing_id):
     borrowing.status = Borrowing.Status.BORROWED
     borrowing.save(update_fields=['confirmed_by', 'confirmed_at', 'status', 'updated_at'])
     messages.success(request, 'Đã xác nhận phiếu mượn.')
+    return redirect('loan-list')
+
+
+@role_required('ADMIN', 'LIBRARIAN')
+@require_POST
+def confirm_fine_payment_view(request, borrowing_id):
+    borrowing = get_object_or_404(Borrowing, pk=borrowing_id)
+    borrowing.is_fine_paid = True
+    borrowing.save(update_fields=['is_fine_paid', 'updated_at'])
+    messages.success(request, 'Đã ghi nhận thu phạt.')
     return redirect('loan-list')

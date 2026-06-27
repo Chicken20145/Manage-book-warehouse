@@ -7,7 +7,7 @@ class BorrowedItemInline(admin.TabularInline):
 
 @admin.register(Borrowing)
 class BorrowingAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'borrow_date', 'due_date', 'status', 'fine')
+    list_display = ('id', 'user', 'borrow_date', 'due_date', 'status', 'fine', 'is_fine_paid')
     list_filter = ('status', 'borrow_date')
     search_fields = ('user__username',)
     inlines = [BorrowedItemInline]

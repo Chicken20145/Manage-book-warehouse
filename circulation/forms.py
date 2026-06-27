@@ -1,5 +1,6 @@
 from django import forms
 
+from accounts.models import CustomUser
 from catalog.models import Book
 from .models import Borrowing
 
@@ -14,6 +15,12 @@ class BorrowingForm(forms.ModelForm):
     class Meta:
         model = Borrowing
         fields = ['user', 'borrow_date', 'due_date', 'notes']
+        labels = {
+            'user': 'Sinh viên',
+            'borrow_date': 'Ngày mượn',
+            'due_date': 'Hạn trả',
+            'notes': 'Ghi chú',
+        }
         widgets = {
             'user': forms.Select(attrs={'class': 'form-select'}),
             'borrow_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
@@ -23,7 +30,10 @@ class BorrowingForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['user'].queryset = CustomUser.objects.filter(role='STUDENT').order_by('username')
+        self.fields['user'].empty_label = 'Chọn sinh viên'
         self.fields['books'].queryset = Book.objects.filter(available_copies__gt=0)
+        self.fields['books'].widget.attrs.update({'class': 'form-check-input'})
 
     def clean_books(self):
         books = self.cleaned_data['books']
