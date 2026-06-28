@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Quản trị hệ thống | Book Warehouse{% endblock %}
+{% block page_heading %}Quản trị hệ thống{% endblock %}
+
+{% block content %}
+<section class="page-hero p-4 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
+        <div>
+            <span class="status-pill">Quản trị</span>
+            <h1 class="h3 fw-bold mt-3 mb-2">Bảng điều phối dịch vụ thuê sách</h1>
+            <p class="text-muted mb-0">Quản trị viên có thể kiểm soát toàn bộ tài khoản khách hàng, nhân viên, phân quyền và cấu hình thông tin hệ thống.</p>
+        </div>
+        <form method="get" class="input-group" style="max-width: 360px;">
+            <input class="form-control" type="text" name="q" value="{{ query }}" placeholder="Tìm tên đăng nhập, email, mã khách...">
+            <button class="btn btn-brand" type="submit">Tìm kiếm</button>
+        </form>
+    </div>
+</section>
+
+<!-- Stats Grid -->
+<section class="row g-3 mb-4">
+    <div class="col-md-3">
+        <article class="metric-card tone-primary p-3 text-center">
+            <div class="text-muted small fw-bold">TỔNG TÀI KHOẢN</div>
+            <div class="metric-value my-2 text-primary">{{ stats.total }}</div>
+            <p class="text-muted small mb-0">Tất cả tài khoản trong hệ thống</p>
+        </article>
+    </div>
+    <div class="col-md-3">
+        <article class="metric-card tone-success p-3 text-center">
+            <div class="text-muted small fw-bold">KHÁCH HÀNG</div>
+            <div class="metric-value my-2 text-success">{{ stats.student }}</div>
+            <p class="text-muted small mb-0">Tài khoản thành viên thuê sách</p>
+        </article>
+    </div>
+    <div class="col-md-3">
+        <article class="metric-card tone-warning p-3 text-center">
+            <div class="text-muted small fw-bold">NHÂN VIÊN</div>
+            <div class="metric-value my-2 text-warning">{{ stats.librarian }}</div>
+            <p class="text-muted small mb-0">Nhân sự vận hành và cho thuê</p>
+        </article>
+    </div>
+    <div class="col-md-3">
+        <article class="metric-card tone-danger p-3 text-center">
+            <div class="text-muted small fw-bold">QUẢN TRỊ VIÊN</div>
+            <div class="metric-value my-2 text-danger">{{ stats.admin }}</div>
+            <p class="text-muted small mb-0">Quản lý cấp cao của hệ thống</p>
+        </article>
+    </div>
+</section>
+
+<div class="data-card p-4">
+    <!-- Tabs Nav -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold px-4 py-2" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-panel" type="button" role="tab" aria-controls="users-panel" aria-selected="true">
+                Quản lý tài khoản & Quyền hạn
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold px-4 py-2" id="system-tab" data-bs-toggle="tab" data-bs-target="#system-panel" type="button" role="tab" aria-controls="system-panel" aria-selected="false">
+                Thông số máy chủ & Công cụ
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tab-content" id="adminTabsContent">
+        <!-- Tab 1: Users Management -->
+        <div class="tab-pane fade show active" id="users-panel" role="tabpanel" aria-labelledby="users-tab">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tên đăng nhập</th>
+                            <th>Email</th>
+                            <th>Mã khách hàng</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Quyền đặc biệt</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for account in users %}
+                            <tr>
+                                <td class="fw-semibold">{{ account.username }}</td>
+                                <td>{{ account.email|default:"-" }}</td>
+                                <td>{{ account.student_id|default:"-" }}</td>
+                                <td>
+                                    <span class="badge {% if account.role == 'ADMIN' %}bg-danger{% elif account.role == 'LIBRARIAN' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %}">
+                                        {{ account.get_role_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if account.is_active %}
+                                        <span class="badge text-bg-success">Đang hoạt động</span>
+                                    {% else %}
+                                        <span class="badge text-bg-secondary">Bị khóa</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if account.is_superuser %}
+                                        <span class="badge text-bg-danger">Toàn quyền</span>
+                                    {% endif %}
+                                    {% if account.is_staff %}
+                                        <span class="badge text-bg-secondary">Staff</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a class="btn btn-sm btn-brand" href="{% url 'user-update' account.pk %}">Sửa vai trò</a>
+                                        <a class="btn btn-sm btn-outline-danger" href="{% url 'user-password-reset' account.pk %}">Đặt mật khẩu</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="7" class="text-center text-muted py-4">Không tìm thấy tài khoản phù hợp với điều kiện tìm kiếm.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: System Settings & Admin Tools -->
+        <div class="tab-pane fade" id="system-panel" role="tabpanel" aria-labelledby="system-tab">
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <h3 class="h5 fw-bold mb-3 border-bottom pb-2">Trạng thái kỹ thuật</h3>
+                    <table class="table table-sm align-middle table-borderless">
+                        <tbody>
+                            <tr>
+                                <td class="fw-semibold text-muted" style="width: 180px;">Phiên bản Django:</td>
+                                <td><code>{{ sys_info.django }}</code></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-muted">Phiên bản Python:</td>
+                                <td><code>{{ sys_info.python }}</code></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-muted">Hệ điều hành máy chủ:</td>
+                                <td><span class="text-capitalize">{{ sys_info.os }}</span></td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-muted">Cơ sở dữ liệu chính:</td>
+                                <td>SQLite (db.sqlite3)</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold text-muted">Thời gian hệ thống:</td>
+                                <td>{% now "d/m/Y H:i:s" %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6">
+                    <h3 class="h5 fw-bold mb-3 border-bottom pb-2">Công cụ nhà phát triển & DBA</h3>
+                    <p class="text-muted small">Trong trường hợp cần cấu hình quyền sâu hơn, quản lý dữ liệu thô trực tiếp hoặc thực hiện các tác vụ quản trị cơ sở dữ liệu chuyên biệt, hãy truy cập vào trang Admin mặc định của Django.</p>
+                    <div class="mt-4 p-3 bg-light rounded border text-center">
+                        <a href="/admin/" target="_blank" class="btn btn-outline-secondary px-4 py-2 fw-semibold">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-up-right me-2" viewBox="0 0 16 16">
+                              <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"/>
+                              <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"/>
+                            </svg>
+                            Truy cập Django Admin
+                        </a>
+                        <small class="d-block text-muted mt-2">Lưu ý: Chỉ tài khoản có cờ <code>is_staff</code> hoặc <code>is_superuser</code> mới có thể truy cập.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

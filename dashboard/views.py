@@ -8,8 +8,8 @@ from circulation.models import Borrowing
 
 ROLE_LABELS = {
     'ADMIN': 'Quản trị viên',
-    'LIBRARIAN': 'Thủ thư',
-    'STUDENT': 'Sinh viên',
+    'LIBRARIAN': 'Nhân viên',
+    'STUDENT': 'Khách hàng',
 }
 
 
@@ -25,39 +25,39 @@ def dashboard_view(request):
             'note': 'Tổng số đầu sách đang được quản lý trong kho.',
         },
         {
-            'label': 'Đang cho mượn',
+            'label': 'Đang cho thuê',
             'value': Borrowing.objects.filter(status=Borrowing.Status.BORROWED).count(),
             'tone': 'warning',
-            'note': 'Phiếu mượn đang mở và chưa xác nhận trả.',
+            'note': 'Phiếu thuê đang mở và chưa xác nhận trả.',
         },
         {
-            'label': 'Sinh viên',
+            'label': 'Khách hàng',
             'value': student_count,
             'tone': 'success',
-            'note': 'Tài khoản sinh viên có thể mượn sách trong hệ thống.',
+            'note': 'Tài khoản khách hàng có thể thuê sách trong hệ thống.',
         },
         {
             'label': 'Quá hạn',
             'value': Borrowing.objects.filter(status=Borrowing.Status.OVERDUE).count(),
             'tone': 'danger',
-            'note': 'Phiếu cần thủ thư theo dõi và nhắc trả sách.',
+            'note': 'Phiếu cần nhân viên theo dõi và nhắc trả sách.',
         },
     ]
     actions_by_role = {
         'ADMIN': [
             'Kiểm tra tài khoản mới và phân quyền.',
-            'Duyệt thay đổi model trước khi chạy migration.',
+            'Duyệt thay đổi cấu hình hệ thống.',
             'Theo dõi trạng thái các phân hệ trong dashboard.',
         ],
         'LIBRARIAN': [
             'Cập nhật danh mục sách và tình trạng tồn kho.',
-            'Xác nhận phiếu mượn/trả sách.',
-            'Theo dõi sách quá hạn cần nhắc sinh viên.',
+            'Xác nhận phiếu thuê/trả sách.',
+            'Theo dõi sách quá hạn cần nhắc khách hàng.',
         ],
         'STUDENT': [
             'Tìm sách trong kho.',
-            'Theo dõi sách đang mượn.',
-            'Xem lịch sử mượn/trả của bản thân.',
+            'Theo dõi sách đang thuê.',
+            'Xem lịch sử thuê/trả của bản thân.',
         ],
     }
     context = {

@@ -7,7 +7,7 @@ from django.utils import timezone
 
 class Borrowing(models.Model):
     class Status(models.TextChoices):
-        BORROWED = 'BORROWED', 'Đang mượn'
+        BORROWED = 'BORROWED', 'Đang thuê'
         RETURNED = 'RETURNED', 'Đã trả'
         OVERDUE = 'OVERDUE', 'Quá hạn'
 

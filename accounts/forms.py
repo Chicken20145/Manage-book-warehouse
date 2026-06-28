@@ -7,27 +7,25 @@ from .models import CustomUser
 class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = CustomUser
-        fields = ('username', 'email', 'role', 'student_id')
+        fields = ('username', 'email', 'student_id')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         labels = {
             'username': 'Tên đăng nhập',
             'email': 'Email',
-            'role': 'Vai trò',
-            'student_id': 'Mã sinh viên',
+            'student_id': 'Mã khách hàng',
             'password1': 'Mật khẩu',
             'password2': 'Nhập lại mật khẩu',
         }
         placeholders = {
             'username': 'vd: nguyenvana',
             'email': 'vd: ban@example.com',
-            'student_id': 'Bỏ trống nếu không phải sinh viên',
+            'student_id': 'Mã định danh khách hàng (tùy chọn)',
         }
         for name, field in self.fields.items():
             field.label = labels.get(name, field.label)
-            css_class = 'form-select' if name == 'role' else 'form-control'
-            field.widget.attrs.update({'class': css_class})
+            field.widget.attrs.update({'class': 'form-control'})
             if name in placeholders:
                 field.widget.attrs['placeholder'] = placeholders[name]
 
@@ -40,7 +38,7 @@ class ProfileUpdateForm(forms.ModelForm):
             'first_name': 'Tên',
             'last_name': 'Họ',
             'email': 'Email',
-            'student_id': 'Mã sinh viên',
+            'student_id': 'Mã khách hàng',
         }
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -60,7 +58,7 @@ class AdminUserUpdateForm(forms.ModelForm):
             'last_name': 'Họ',
             'email': 'Email',
             'role': 'Vai trò',
-            'student_id': 'Mã sinh viên',
+            'student_id': 'Mã khách hàng',
             'is_active': 'Đang hoạt động',
             'is_staff': 'Có quyền staff',
             'is_superuser': 'Toàn quyền hệ thống',

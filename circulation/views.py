@@ -71,7 +71,7 @@ def create_borrowing_view(request):
             except ValueError as exc:
                 messages.error(request, str(exc))
                 return redirect('loan-list')
-            messages.success(request, 'Đã tạo phiếu mượn.')
+            messages.success(request, 'Đã tạo phiếu thuê.')
             return redirect('loan-list')
         error_messages = []
         for field, errors in form.errors.items():
@@ -80,7 +80,7 @@ def create_borrowing_view(request):
                 error_messages.append(f'{label}: {error}')
         messages.error(
             request,
-            'Không thể tạo phiếu mượn. ' + (' | '.join(error_messages) if error_messages else 'Vui lòng kiểm tra lại dữ liệu.'),
+            'Không thể tạo phiếu thuê. ' + (' | '.join(error_messages) if error_messages else 'Vui lòng kiểm tra lại dữ liệu.'),
         )
     return redirect('loan-list')
 
@@ -116,12 +116,12 @@ def confirm_return_view(request, borrowing_id):
 def confirm_borrowing_view(request, borrowing_id):
     borrowing = get_object_or_404(Borrowing, pk=borrowing_id)
     if borrowing.status != Borrowing.Status.BORROWED:
-        messages.error(request, 'Chỉ có thể xác nhận mượn với phiếu đang mượn.')
+        messages.error(request, 'Chỉ có thể xác nhận thuê với phiếu đang thuê.')
         return redirect('loan-list')
     borrowing.confirmed_by = request.user
     borrowing.confirmed_at = timezone.now()
     borrowing.save(update_fields=['confirmed_by', 'confirmed_at', 'updated_at'])
-    messages.success(request, 'Đã xác nhận phiếu mượn.')
+    messages.success(request, 'Đã xác nhận phiếu thuê.')
     return redirect('loan-list')
 
 

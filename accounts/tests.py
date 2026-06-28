@@ -26,7 +26,6 @@ class AccountFlowTests(TestCase):
         response = self.client.post(reverse('register'), {
             'username': 'new_student',
             'email': 'new@example.com',
-            'role': 'STUDENT',
             'student_id': 'SV200',
             'password1': 'StrongPass12345',
             'password2': 'StrongPass12345',
@@ -65,7 +64,7 @@ class AccountFlowTests(TestCase):
             'is_staff': 'on',
         })
 
-        self.assertRedirects(response, reverse('user-list'))
+        self.assertRedirects(response, reverse('admin-panel'))
         self.student.refresh_from_db()
         self.assertEqual(self.student.role, 'LIBRARIAN')
         self.assertTrue(self.student.is_staff)
@@ -78,12 +77,12 @@ class AccountFlowTests(TestCase):
             'new_password2': 'AdminSetPass12345',
         })
 
-        self.assertRedirects(response, reverse('user-list'))
+        self.assertRedirects(response, reverse('admin-panel'))
         self.student.refresh_from_db()
         self.assertTrue(self.student.check_password('AdminSetPass12345'))
 
     def test_student_cannot_access_user_management(self):
         self.client.force_login(self.student)
-        response = self.client.get(reverse('user-list'))
+        response = self.client.get(reverse('admin-panel'))
 
         self.assertEqual(response.status_code, 403)
