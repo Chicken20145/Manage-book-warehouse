@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Tra cứu sách OPAC | Book Warehouse{% endblock %}
+{% block page_heading %}Tra cứu sách trực quan{% endblock %}
+
+{% block content %}
+<section class="page-hero p-4 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
+        <div>
+            <span class="status-pill">OPAC</span>
+            <h1 class="h3 fw-bold mt-3 mb-2">Thư viện sách thuê trực tuyến</h1>
+            <p class="text-muted mb-0">Tìm kiếm nhanh sách trong kho, xem số lượng bản sách sẵn có và các thông tin liên quan.</p>
+        </div>
+        <form method="get" class="input-group" style="max-width: 420px;">
+            <input class="form-control" type="text" name="q" value="{{ query }}" placeholder="Tìm tên sách, tác giả, mã sách...">
+            <button class="btn btn-brand" type="submit">Tìm kiếm</button>
+        </form>
+    </div>
+</section>
+
+<!-- Visual Grid Layout -->
+<section class="row g-4">
+    {% for book in books %}
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <article class="book-card h-100 d-flex flex-column">
+                <!-- Simulated book cover using dynamic CSS gradients -->
+                <div class="book-cover-mock {% cycle 'grad-indigo' 'grad-rose' 'grad-emerald' 'grad-amber' 'grad-teal' 'grad-violet' as cover_grad %}">
+                    <div class="book-cover-code">{{ book.code }}</div>
+                    <div class="book-cover-title">{{ book.title }}</div>
+                    <div class="book-cover-author">{{ book.author|default:"Tác giả ẩn danh" }}</div>
+                    <div class="book-cover-spine"></div>
+                </div>
+                
+                <div class="p-3 d-flex flex-column flex-grow-1">
+                    <h3 class="h6 fw-bold mb-1 text-truncate-2" title="{{ book.title }}">{{ book.title }}</h3>
+                    <p class="text-muted small mb-2 text-truncate">{{ book.author|default:"-" }}</p>
+                    
+                    <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="small text-muted d-block">Sẵn có:</span>
+                            <span class="fw-bold">{{ book.available_copies }} / {{ book.total_copies }} bản</span>
+                        </div>
+                        <div>
+                            {% if book.available_copies > 0 %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1">Còn sách</span>
+                            {% else %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3 py-1">Hết sách</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-warning text-center py-5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-search mb-3 text-muted" viewBox="0 0 16 16">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                </svg>
+                <h4 class="fw-bold">Không tìm thấy sách nào phù hợp</h4>
+                <p class="text-muted mb-0">Thử tìm kiếm với từ khóa khác như tên tác giả hoặc mã sách.</p>
+            </div>
+        </div>
+    {% endfor %}
+</section>
+
+<style>
+    /* Sleek Book Card styling */
+    .book-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(16, 24, 40, .04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 36px rgba(16, 24, 40, .1);
+    }
+
+    /* CSS Gradients for covers */
+    .book-cover-mock {
+        position: relative;
+        height: 200px;
+        padding: 20px;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+    }
+    
+    .book-cover-spine {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 10px;
+        background: rgba(0, 0, 0, 0.15);
+        box-shadow: inset -2px 0 5px rgba(0, 0, 0, 0.15);
+    }
+    
+    .book-cover-code {
+        font-family: monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        background: rgba(0, 0, 0, 0.25);
+        padding: 4px 8px;
+        border-radius: 4px;
+        width: fit-content;
+        backdrop-filter: blur(2px);
+    }
+    
+    .book-cover-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        line-height: 1.3;
+        margin-top: 15px;
+        margin-bottom: auto;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .book-cover-author {
+        font-size: 0.8rem;
+        font-weight: 500;
+        opacity: 0.9;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Gradient definitions */
+    .grad-indigo { background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); }
+    .grad-rose { background: linear-gradient(135deg, #e11d48 0%, #4c0519 100%); }
+    .grad-emerald { background: linear-gradient(135deg, #059669 0%, #064e3b 100%); }
+    .grad-amber { background: linear-gradient(135deg, #d97706 0%, #78350f 100%); }
+    .grad-teal { background: linear-gradient(135deg, #0d9488 0%, #115e59 100%); }
+    .grad-violet { background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); }
+    
+    .text-truncate-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

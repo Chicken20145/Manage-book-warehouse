@@ -154,8 +154,12 @@
 
         <nav class="nav flex-column gap-1">
             <a class="nav-link" href="{% url 'dashboard' %}">Tổng quan</a>
+            <a class="nav-link" href="{% url 'opac' %}">Tra cứu sách (OPAC)</a>
             <a class="nav-link" href="{% url 'book-list' %}">Danh mục sách</a>
             <a class="nav-link" href="{% url 'loan-list' %}">Thuê trả</a>
+            {% if user.is_authenticated and user.role == 'ADMIN' or user.role == 'LIBRARIAN' or user.is_superuser %}
+                <a class="nav-link" href="{% url 'statistics' %}">Thống kê</a>
+            {% endif %}
             {% if user.is_authenticated and user.role == 'ADMIN' or user.is_superuser %}
                 <a class="nav-link" href="{% url 'admin-panel' %}">Quản trị</a>
             {% endif %}
