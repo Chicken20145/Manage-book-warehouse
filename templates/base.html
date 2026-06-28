@@ -160,7 +160,9 @@
         <nav class="nav flex-column gap-1">
             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Tổng quan</a>
             <a class="nav-link {% if request.resolver_match.url_name == 'opac' %}active{% endif %}" href="{% url 'opac' %}">Tra cứu sách (OPAC)</a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'book-list' or request.resolver_match.url_name == 'book-create' or request.resolver_match.url_name == 'book-update' or request.resolver_match.url_name == 'book-delete' %}active{% endif %}" href="{% url 'book-list' %}">Danh mục sách</a>
+            {% if user.is_authenticated and user.role == 'ADMIN' or user.role == 'LIBRARIAN' or user.is_superuser %}
+                <a class="nav-link {% if request.resolver_match.url_name == 'book-list' or request.resolver_match.url_name == 'book-create' or request.resolver_match.url_name == 'book-update' or request.resolver_match.url_name == 'book-delete' %}active{% endif %}" href="{% url 'book-list' %}">Danh mục sách</a>
+            {% endif %}
             <a class="nav-link {% if request.resolver_match.url_name == 'loan-list' %}active{% endif %}" href="{% url 'loan-list' %}">Mượn trả</a>
             {% if user.is_authenticated and user.role == 'ADMIN' or user.role == 'LIBRARIAN' or user.is_superuser %}
                 <a class="nav-link {% if request.resolver_match.url_name == 'statistics' %}active{% endif %}" href="{% url 'statistics' %}">Thống kê</a>

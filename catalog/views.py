@@ -10,12 +10,22 @@ def is_admin_or_librarian(user):
     # Chỉ quản trị viên và thủ thư được thao tác dữ liệu sách.
     return getattr(user, 'role', '') in ['ADMIN', 'LIBRARIAN'] or user.is_superuser
 
-# 2. XEM DANH SÁCH & TÌM KIẾM (Ai cũng xem được)
+
+@login_required
+def catalog_home_view(request):
+    if is_admin_or_librarian(request.user):
+        return redirect('book-list')
+    return redirect('opac')
+
+
+# 2. XEM DANH SÁCH & TÌM KIẾM (Chỉ ADMIN/LIBRARIAN)
 @login_required
 def book_list_view(request):
+    if not is_admin_or_librarian(request.user):
+        return redirect('opac')
+
     query = request.GET.get('q', '')
-    can_edit = is_admin_or_librarian(request.user)
-    books = Book.objects.all() if can_edit else Book.objects.filter(is_active=True)
+    books = Book.objects.all()
     
     # Logic tìm kiếm theo Tên, Tác giả hoặc Mã sách
     if query:
@@ -28,7 +38,7 @@ def book_list_view(request):
     return render(request, 'catalog/book_list.html', {
         'books': books, 
         'query': query,
-        'can_edit': can_edit
+        'can_edit': True
     })
 
 # 3. THÊM SÁCH (Chỉ ADMIN/LIBRARIAN)

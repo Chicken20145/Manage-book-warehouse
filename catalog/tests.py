@@ -36,8 +36,14 @@ class CatalogViewsTests(TestCase):
             available_copies=1,
         )
 
-    def test_catalog_root_redirects_to_book_list(self):
+    def test_catalog_root_redirects_student_to_opac(self):
         self.client.force_login(self.student)
+        response = self.client.get('/catalog/')
+
+        self.assertRedirects(response, reverse('opac'))
+
+    def test_catalog_root_redirects_librarian_to_book_list(self):
+        self.client.force_login(self.librarian)
         response = self.client.get('/catalog/')
 
         self.assertRedirects(response, reverse('book-list'))
@@ -117,7 +123,7 @@ class CatalogViewsTests(TestCase):
         self.assertEqual(self.book.title, 'Catalog Safety')
         self.assertTrue(self.book.is_active)
 
-    def test_search_books_by_title_author_or_code(self):
+    def test_librarian_searches_books_by_title_author_or_code(self):
         Book.objects.create(
             code='BK-SEARCH-002',
             title='Algorithms Handbook',
@@ -125,7 +131,7 @@ class CatalogViewsTests(TestCase):
             total_copies=1,
             available_copies=1,
         )
-        self.client.force_login(self.student)
+        self.client.force_login(self.librarian)
 
         for query in ['Algorithms', 'Special Writer', 'BK-SEARCH-002']:
             response = self.client.get(reverse('book-list'), {'q': query})
@@ -150,6 +156,12 @@ class CatalogViewsTests(TestCase):
         self.book.save(update_fields=['is_active'])
 
         self.client.force_login(self.student)
-        response = self.client.get(reverse('book-list'))
+        response = self.client.get(reverse('opac'))
 
         self.assertNotContains(response, 'Catalog Safety')
+
+    def test_student_book_list_redirects_to_opac(self):
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('book-list'))
+
+        self.assertRedirects(response, reverse('opac'))

@@ -1,9 +1,8 @@
 from django.urls import path
-from django.views.generic import RedirectView
 from . import views
 
 urlpatterns = [
-    path('', RedirectView.as_view(pattern_name='book-list', permanent=False), name='catalog-home'),
+    path('', views.catalog_home_view, name='catalog-home'),
 
     # Xem danh sách
     path('books/', views.book_list_view, name='book-list'),

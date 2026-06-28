@@ -9,8 +9,8 @@
     <div class="row align-items-center g-4 g-xl-5">
         <div class="col-xl-7">
             <span class="status-pill">Vai trò: {{ role }}</span>
-            <h1 class="display-6 fw-bold mt-3 mb-3">Bảng điều hành thư viện</h1>
-            <p class="lead text-muted mb-4">Tập trung các việc quan trọng trong ngày: sách còn khả dụng, phiếu đang mượn, quá hạn và quyền tài khoản.</p>
+            <h1 class="display-6 fw-bold mt-3 mb-3">{{ dashboard_title }}</h1>
+            <p class="lead text-muted mb-4">{{ dashboard_intro }}</p>
             <div class="d-flex flex-wrap gap-2">
                 {% for link in primary_links %}
                     <a class="btn {{ link.style }} px-4" href="{% url link.url_name %}">{{ link.label }}</a>
@@ -45,12 +45,14 @@
 <section class="panel-card p-4">
     <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
         <div>
-            <h2 class="h5 fw-bold mb-1">Tình hình vận hành</h2>
-            <p class="text-muted mb-0">Có {{ borrowed_count }} phiếu đang mượn, {{ overdue_count }} phiếu quá hạn và {{ student_count }} tài khoản sinh viên trong hệ thống.</p>
+            <h2 class="h5 fw-bold mb-1">{{ summary_title }}</h2>
+            <p class="text-muted mb-0">{{ summary_text }}</p>
         </div>
         <div class="d-flex gap-2">
             <a class="btn btn-outline-secondary" href="{% url 'opac' %}">OPAC</a>
-            <a class="btn btn-outline-secondary" href="{% url 'book-list' %}">Danh mục</a>
+            {% if role_code == 'ADMIN' or role_code == 'LIBRARIAN' %}
+                <a class="btn btn-outline-secondary" href="{% url 'book-list' %}">Danh mục</a>
+            {% endif %}
             <a class="btn btn-brand" href="{% url 'loan-list' %}">Mượn trả</a>
         </div>
     </div>

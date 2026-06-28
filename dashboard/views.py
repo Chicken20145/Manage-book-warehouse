@@ -27,7 +27,13 @@ def dashboard_view(request):
     )
     borrowed_count = Borrowing.objects.filter(status=Borrowing.Status.BORROWED).count()
     overdue_count = Borrowing.objects.filter(status=Borrowing.Status.OVERDUE).count()
-    cards = [
+
+    my_borrowings = Borrowing.objects.filter(user=request.user)
+    my_borrowed_count = my_borrowings.filter(status=Borrowing.Status.BORROWED).count()
+    my_overdue_count = my_borrowings.filter(status=Borrowing.Status.OVERDUE).count()
+    my_returned_count = my_borrowings.filter(status=Borrowing.Status.RETURNED).count()
+
+    common_library_cards = [
         {
             'label': 'Đầu sách hoạt động',
             'value': active_books.count(),
@@ -53,6 +59,36 @@ def dashboard_view(request):
             'note': 'Phiếu cần thủ thư theo dõi và nhắc trả sách.',
         },
     ]
+    cards_by_role = {
+        'ADMIN': common_library_cards,
+        'LIBRARIAN': common_library_cards,
+        'STUDENT': [
+            {
+                'label': 'Sách có thể tra cứu',
+                'value': active_books.count(),
+                'tone': 'primary',
+                'note': 'Đầu sách đang mở trong OPAC để bạn tìm kiếm.',
+            },
+            {
+                'label': 'Bản sách sẵn có',
+                'value': active_agg['available'] or 0,
+                'tone': 'success',
+                'note': 'Số bản sách còn có thể mượn tại thư viện.',
+            },
+            {
+                'label': 'Phiếu của tôi',
+                'value': my_borrowed_count,
+                'tone': 'warning',
+                'note': 'Phiếu mượn của bạn đang chờ trả.',
+            },
+            {
+                'label': 'Quá hạn của tôi',
+                'value': my_overdue_count,
+                'tone': 'danger',
+                'note': 'Phiếu cần trả sớm để tránh phát sinh thêm phí.',
+            },
+        ],
+    }
     actions_by_role = {
         'ADMIN': [
             'Rà soát tài khoản và phân quyền người dùng.',
@@ -87,15 +123,37 @@ def dashboard_view(request):
             {'label': 'Cài đặt tài khoản', 'url_name': 'account-settings', 'style': 'btn-outline-secondary'},
         ],
     }
+    dashboard_meta_by_role = {
+        'ADMIN': {
+            'title': 'Bảng quản trị hệ thống',
+            'intro': 'Theo dõi toàn bộ thư viện: kho sách, phiếu mượn trả, quá hạn, báo cáo và phân quyền tài khoản.',
+            'summary_title': 'Tình hình toàn hệ thống',
+            'summary_text': f'Có {borrowed_count} phiếu đang mượn, {overdue_count} phiếu quá hạn và {student_count} tài khoản sinh viên trong hệ thống.',
+        },
+        'LIBRARIAN': {
+            'title': 'Bảng làm việc thủ thư',
+            'intro': 'Tập trung vào nghiệp vụ hằng ngày: tạo phiếu mượn, xác nhận trả sách, theo dõi quá hạn và cập nhật kho.',
+            'summary_title': 'Tình hình mượn trả',
+            'summary_text': f'Có {borrowed_count} phiếu đang mượn và {overdue_count} phiếu quá hạn cần theo dõi.',
+        },
+        'STUDENT': {
+            'title': 'Trang cá nhân sinh viên',
+            'intro': 'Tra cứu sách trong thư viện, theo dõi phiếu đang mượn của bạn và cập nhật thông tin tài khoản.',
+            'summary_title': 'Tình hình mượn sách của tôi',
+            'summary_text': f'Bạn có {my_borrowed_count} phiếu đang mượn, {my_overdue_count} phiếu quá hạn và {my_returned_count} phiếu đã trả.',
+        },
+    }
+    dashboard_meta = dashboard_meta_by_role.get(role, dashboard_meta_by_role['STUDENT'])
     context = {
         'role': ROLE_LABELS.get(role, role),
         'role_code': role,
-        'cards': cards,
+        'cards': cards_by_role.get(role, cards_by_role['STUDENT']),
         'actions': actions_by_role.get(role, actions_by_role['STUDENT']),
         'primary_links': primary_links_by_role.get(role, primary_links_by_role['STUDENT']),
-        'student_count': student_count,
-        'borrowed_count': borrowed_count,
-        'overdue_count': overdue_count,
+        'dashboard_title': dashboard_meta['title'],
+        'dashboard_intro': dashboard_meta['intro'],
+        'summary_title': dashboard_meta['summary_title'],
+        'summary_text': dashboard_meta['summary_text'],
     }
     return render(request, 'dashboard/index.html', context)
 
