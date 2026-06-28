@@ -115,10 +115,12 @@ def confirm_return_view(request, borrowing_id):
 @require_POST
 def confirm_borrowing_view(request, borrowing_id):
     borrowing = get_object_or_404(Borrowing, pk=borrowing_id)
+    if borrowing.status != Borrowing.Status.BORROWED:
+        messages.error(request, 'Chỉ có thể xác nhận mượn với phiếu đang mượn.')
+        return redirect('loan-list')
     borrowing.confirmed_by = request.user
     borrowing.confirmed_at = timezone.now()
-    borrowing.status = Borrowing.Status.BORROWED
-    borrowing.save(update_fields=['confirmed_by', 'confirmed_at', 'status', 'updated_at'])
+    borrowing.save(update_fields=['confirmed_by', 'confirmed_at', 'updated_at'])
     messages.success(request, 'Đã xác nhận phiếu mượn.')
     return redirect('loan-list')
 

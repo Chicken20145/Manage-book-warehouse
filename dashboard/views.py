@@ -1,5 +1,9 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.shortcuts import render
+
+from catalog.models import Book
+from circulation.models import Borrowing
 
 
 ROLE_LABELS = {
@@ -12,24 +16,31 @@ ROLE_LABELS = {
 @login_required
 def dashboard_view(request):
     role = getattr(request.user, 'role', 'STUDENT')
+    student_count = get_user_model().objects.filter(role='STUDENT').count()
     cards = [
         {
-            'label': 'Sach trong kho',
-            'value': '1,250',
+            'label': 'Sách trong kho',
+            'value': Book.objects.count(),
             'tone': 'primary',
-            'note': 'Catalog sẽ thay số liệu thật sau khi hoàn thành model Book.',
+            'note': 'Tổng số đầu sách đang được quản lý trong kho.',
         },
         {
             'label': 'Đang cho mượn',
-            'value': '45',
+            'value': Borrowing.objects.filter(status=Borrowing.Status.BORROWED).count(),
             'tone': 'warning',
-            'note': 'Circulation sẽ cập nhật theo phiếu mượn/trả.',
+            'note': 'Phiếu mượn đang mở và chưa xác nhận trả.',
         },
         {
-            'label': 'Người dùng',
-            'value': '320',
+            'label': 'Sinh viên',
+            'value': student_count,
             'tone': 'success',
-            'note': 'Admin theo dõi tài khoản và phân quyền.',
+            'note': 'Tài khoản sinh viên có thể mượn sách trong hệ thống.',
+        },
+        {
+            'label': 'Quá hạn',
+            'value': Borrowing.objects.filter(status=Borrowing.Status.OVERDUE).count(),
+            'tone': 'danger',
+            'note': 'Phiếu cần thủ thư theo dõi và nhắc trả sách.',
         },
     ]
     actions_by_role = {

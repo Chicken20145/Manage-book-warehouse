@@ -120,3 +120,21 @@ class CirculationFlowTests(TestCase):
         self.assertEqual(response.status_code, 200)
         borrowing.refresh_from_db()
         self.assertEqual(borrowing.status, Borrowing.Status.OVERDUE)
+
+    def test_confirm_borrowing_does_not_reopen_returned_loan(self):
+        borrowing = Borrowing.objects.create(
+            user=self.student,
+            borrow_date=date.today() - timedelta(days=5),
+            due_date=date.today() + timedelta(days=9),
+            returned_date=date.today(),
+            status=Borrowing.Status.RETURNED,
+            confirmed_by=self.admin,
+        )
+
+        self.client.force_login(self.librarian)
+        response = self.client.post(reverse('borrow-confirm', args=[borrowing.pk]))
+
+        self.assertRedirects(response, reverse('loan-list'))
+        borrowing.refresh_from_db()
+        self.assertEqual(borrowing.status, Borrowing.Status.RETURNED)
+        self.assertEqual(borrowing.confirmed_by, self.admin)

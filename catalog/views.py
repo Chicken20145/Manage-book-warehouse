@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
@@ -65,6 +66,10 @@ def book_update_view(request, pk):
 def book_delete_view(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
+        if book.borrowed_items.exists():
+            messages.error(request, 'Không thể xóa sách đã phát sinh phiếu mượn. Hãy điều chỉnh số lượng hoặc ngưng sử dụng sách này.')
+            return redirect('book-list')
         book.delete()
+        messages.success(request, 'Đã xóa sách khỏi danh mục.')
         return redirect('book-list')
     return render(request, 'catalog/book_confirm_delete.html', {'book': book})
