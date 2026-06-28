@@ -14,7 +14,8 @@ def is_admin_or_librarian(user):
 @login_required
 def book_list_view(request):
     query = request.GET.get('q', '')
-    books = Book.objects.all()
+    can_edit = is_admin_or_librarian(request.user)
+    books = Book.objects.all() if can_edit else Book.objects.filter(is_active=True)
     
     # Logic tìm kiếm theo Tên, Tác giả hoặc Mã sách
     if query:
@@ -23,9 +24,6 @@ def book_list_view(request):
             Q(author__icontains=query) |
             Q(code__icontains=query)
         )
-    
-    # Biến 'can_edit' giúp template biết để ẩn/hiện nút Thêm/Sửa/Xóa
-    can_edit = is_admin_or_librarian(request.user)
     
     return render(request, 'catalog/book_list.html', {
         'books': books, 
@@ -67,7 +65,9 @@ def book_delete_view(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
         if book.borrowed_items.exists():
-            messages.error(request, 'Không thể xóa sách đã phát sinh phiếu mượn. Hãy điều chỉnh số lượng hoặc ngưng sử dụng sách này.')
+            book.is_active = False
+            book.save(update_fields=['is_active', 'updated_at'])
+            messages.warning(request, 'Sách đã có lịch sử mượn nên không bị xóa. Hệ thống đã chuyển sách sang trạng thái ngưng sử dụng.')
             return redirect('book-list')
         book.delete()
         messages.success(request, 'Đã xóa sách khỏi danh mục.')

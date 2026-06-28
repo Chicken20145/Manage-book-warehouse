@@ -32,7 +32,7 @@ class BorrowingForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['user'].queryset = CustomUser.objects.filter(role='STUDENT').order_by('username')
         self.fields['user'].empty_label = 'Chọn sinh viên'
-        self.fields['books'].queryset = Book.objects.filter(available_copies__gt=0)
+        self.fields['books'].queryset = Book.objects.filter(is_active=True, available_copies__gt=0)
         self.fields['books'].widget.attrs.update({'class': 'form-check-input'})
 
     def clean_books(self):

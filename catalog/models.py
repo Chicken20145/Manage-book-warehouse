@@ -9,6 +9,7 @@ class Book(models.Model):
     isbn = models.CharField(max_length=20, blank=True)
     total_copies = models.PositiveIntegerField(default=1)
     available_copies = models.PositiveIntegerField(default=1)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -37,7 +38,7 @@ class Book(models.Model):
 
     @property
     def is_available(self):
-        return self.available_copies > 0
+        return self.is_active and self.available_copies > 0
 
     def __str__(self):
         return f"{self.code} - {self.title}"

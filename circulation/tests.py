@@ -138,3 +138,29 @@ class CirculationFlowTests(TestCase):
         borrowing.refresh_from_db()
         self.assertEqual(borrowing.status, Borrowing.Status.RETURNED)
         self.assertEqual(borrowing.confirmed_by, self.admin)
+
+    def test_return_button_is_hidden_for_returned_loan(self):
+        Borrowing.objects.create(
+            user=self.student,
+            borrow_date=date.today() - timedelta(days=5),
+            due_date=date.today() + timedelta(days=9),
+            returned_date=date.today(),
+            status=Borrowing.Status.RETURNED,
+            confirmed_by=self.admin,
+        )
+
+        self.client.force_login(self.librarian)
+        response = self.client.get(reverse('loan-list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'Xác nhận trả')
+
+    def test_inactive_books_are_not_available_for_new_borrowing(self):
+        self.book.is_active = False
+        self.book.save(update_fields=['is_active'])
+
+        self.client.force_login(self.librarian)
+        response = self.client.get(reverse('loan-list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.book.title)

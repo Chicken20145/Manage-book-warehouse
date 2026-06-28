@@ -51,7 +51,9 @@
                         <td>{{ book.available_copies }}</td>
                         <td>
                             <span class="status-pill">
-                                {% if book.is_available %}
+                                {% if not book.is_active %}
+                                    Ngưng sử dụng
+                                {% elif book.is_available %}
                                     Còn sách
                                 {% else %}
                                     Hết sách
@@ -61,7 +63,7 @@
                         {% if user.role == 'ADMIN' or user.role == 'LIBRARIAN' or user.is_superuser %}
                         <td>
                             <a href="{% url 'book-update' book.pk %}" class="btn btn-sm btn-brand me-1">Sửa</a>
-                            <a href="{% url 'book-delete' book.pk %}" class="btn btn-sm btn-danger">Xóa</a>
+                            <a href="{% url 'book-delete' book.pk %}" class="btn btn-sm btn-danger">Xóa/Ngưng</a>
                         </td>
                         {% endif %}
                     </tr>

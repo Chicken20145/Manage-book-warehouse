@@ -86,6 +86,7 @@ class Command(BaseCommand):
             book.isbn = data['isbn']
             book.total_copies = data['total']
             book.available_copies = data['available']
+            book.is_active = True
             book.save()
             books[book.code] = book
 

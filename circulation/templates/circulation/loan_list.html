@@ -145,11 +145,13 @@
                                             <button class="btn btn-sm btn-warning fw-semibold" type="submit">Xác nhận mượn</button>
                                         </form>
                                     {% endif %}
-                                    <form method="post" action="{% url 'return-confirm' loan.id %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="returned_date" value="{% now 'Y-m-d' %}">
-                                        <button class="btn btn-sm btn-success fw-semibold" type="submit">Xác nhận trả</button>
-                                    </form>
+                                    {% if loan.status == 'BORROWED' or loan.status == 'OVERDUE' %}
+                                        <form method="post" action="{% url 'return-confirm' loan.id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="returned_date" value="{% now 'Y-m-d' %}">
+                                            <button class="btn btn-sm btn-success fw-semibold" type="submit">Xác nhận trả</button>
+                                        </form>
+                                    {% endif %}
                                 </div>
                             {% endif %}
                         </td>
