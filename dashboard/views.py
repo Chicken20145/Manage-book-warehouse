@@ -20,47 +20,71 @@ ROLE_LABELS = {
 def dashboard_view(request):
     role = getattr(request.user, 'role', 'STUDENT')
     student_count = get_user_model().objects.filter(role='STUDENT').count()
+    active_books = Book.objects.filter(is_active=True)
+    active_agg = active_books.aggregate(
+        total=Sum('total_copies'),
+        available=Sum('available_copies'),
+    )
+    borrowed_count = Borrowing.objects.filter(status=Borrowing.Status.BORROWED).count()
+    overdue_count = Borrowing.objects.filter(status=Borrowing.Status.OVERDUE).count()
     cards = [
         {
-            'label': 'Sách trong kho',
-            'value': Book.objects.count(),
+            'label': 'Đầu sách hoạt động',
+            'value': active_books.count(),
             'tone': 'primary',
-            'note': 'Tổng số đầu sách đang được quản lý trong kho.',
+            'note': 'Đầu sách đang được hiển thị và phục vụ mượn trả.',
         },
         {
-            'label': 'Đang cho mượn',
-            'value': Borrowing.objects.filter(status=Borrowing.Status.BORROWED).count(),
-            'tone': 'warning',
-            'note': 'Phiếu mượn đang mở và chưa xác nhận trả.',
-        },
-        {
-            'label': 'Sinh viên',
-            'value': student_count,
+            'label': 'Bản sách sẵn có',
+            'value': active_agg['available'] or 0,
             'tone': 'success',
-            'note': 'Tài khoản sinh viên có thể mượn sách trong hệ thống.',
+            'note': f"Tổng số bản có thể cho mượn trên {active_agg['total'] or 0} bản.",
+        },
+        {
+            'label': 'Phiếu đang mượn',
+            'value': borrowed_count,
+            'tone': 'warning',
+            'note': 'Phiếu đang mở và chưa được xác nhận trả.',
         },
         {
             'label': 'Quá hạn',
-            'value': Borrowing.objects.filter(status=Borrowing.Status.OVERDUE).count(),
+            'value': overdue_count,
             'tone': 'danger',
             'note': 'Phiếu cần thủ thư theo dõi và nhắc trả sách.',
         },
     ]
     actions_by_role = {
         'ADMIN': [
-            'Kiểm tra tài khoản mới và phân quyền.',
-            'Kiểm tra cấu hình hệ thống và quyền truy cập.',
-            'Theo dõi trạng thái các phân hệ trong dashboard.',
+            'Rà soát tài khoản và phân quyền người dùng.',
+            'Kiểm tra phiếu quá hạn và tình trạng bản sách.',
+            'Xem báo cáo thống kê trước khi bàn giao dữ liệu.',
         ],
         'LIBRARIAN': [
-            'Cập nhật danh mục sách và tình trạng tồn kho.',
-            'Xác nhận phiếu mượn/trả sách.',
-            'Theo dõi sách quá hạn cần nhắc sinh viên.',
+            'Tạo phiếu mượn cho sinh viên tại quầy.',
+            'Xác nhận trả sách và ghi nhận tiền phạt nếu có.',
+            'Cập nhật số lượng sách còn khả dụng trong kho.',
         ],
         'STUDENT': [
-            'Tìm sách trong kho.',
-            'Theo dõi sách đang mượn.',
-            'Xem lịch sử mượn/trả của bản thân.',
+            'Tra cứu sách còn trong kho trước khi mượn.',
+            'Theo dõi phiếu đang mượn và hạn trả.',
+            'Cập nhật thông tin tài khoản khi cần.',
+        ],
+    }
+    primary_links_by_role = {
+        'ADMIN': [
+            {'label': 'Quản trị tài khoản', 'url_name': 'admin-panel', 'style': 'btn-brand'},
+            {'label': 'Báo cáo thống kê', 'url_name': 'statistics', 'style': 'btn-outline-secondary'},
+            {'label': 'Mượn trả', 'url_name': 'loan-list', 'style': 'btn-outline-secondary'},
+        ],
+        'LIBRARIAN': [
+            {'label': 'Tạo phiếu mượn', 'url_name': 'loan-list', 'style': 'btn-brand'},
+            {'label': 'Danh mục sách', 'url_name': 'book-list', 'style': 'btn-outline-secondary'},
+            {'label': 'Thống kê', 'url_name': 'statistics', 'style': 'btn-outline-secondary'},
+        ],
+        'STUDENT': [
+            {'label': 'Tra cứu sách', 'url_name': 'opac', 'style': 'btn-brand'},
+            {'label': 'Phiếu của tôi', 'url_name': 'loan-list', 'style': 'btn-outline-secondary'},
+            {'label': 'Cài đặt tài khoản', 'url_name': 'account-settings', 'style': 'btn-outline-secondary'},
         ],
     }
     context = {
@@ -68,6 +92,10 @@ def dashboard_view(request):
         'role_code': role,
         'cards': cards,
         'actions': actions_by_role.get(role, actions_by_role['STUDENT']),
+        'primary_links': primary_links_by_role.get(role, primary_links_by_role['STUDENT']),
+        'student_count': student_count,
+        'borrowed_count': borrowed_count,
+        'overdue_count': overdue_count,
     }
     return render(request, 'dashboard/index.html', context)
 

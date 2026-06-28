@@ -2,18 +2,24 @@
 
 {% block title %}Tổng quan | Book Warehouse{% endblock %}
 {% block page_heading %}Tổng quan hệ thống{% endblock %}
+{% block page_subtitle %}Theo dõi nhanh kho sách, phiếu mượn trả và tài khoản người dùng.{% endblock %}
 
 {% block content %}
 <section class="page-hero p-4 p-lg-5 mb-4">
-    <div class="row align-items-center g-4">
-        <div class="col-lg-8">
+    <div class="row align-items-center g-4 g-xl-5">
+        <div class="col-xl-7">
             <span class="status-pill">Vai trò: {{ role }}</span>
-            <h1 class="display-6 fw-bold mt-3 mb-3">Tổng quan vận hành kho sách và phân quyền người dùng.</h1>
-            <p class="lead text-muted mb-0">Theo dõi nhanh tình trạng sách, phiếu mượn trả, tài khoản và các việc cần xử lý theo vai trò của bạn.</p>
+            <h1 class="display-6 fw-bold mt-3 mb-3">Bảng điều hành thư viện</h1>
+            <p class="lead text-muted mb-4">Tập trung các việc quan trọng trong ngày: sách còn khả dụng, phiếu đang mượn, quá hạn và quyền tài khoản.</p>
+            <div class="d-flex flex-wrap gap-2">
+                {% for link in primary_links %}
+                    <a class="btn {{ link.style }} px-4" href="{% url link.url_name %}">{{ link.label }}</a>
+                {% endfor %}
+            </div>
         </div>
-        <div class="col-lg-4">
-            <div class="panel-card p-4">
-                <div class="text-muted small text-uppercase fw-bold">Việc cần chú ý</div>
+        <div class="col-xl-5">
+            <div class="panel-card p-4 h-100">
+                <div class="text-muted small text-uppercase fw-bold">Ưu tiên xử lý</div>
                 <ul class="list-unstyled mt-3 mb-0 d-grid gap-2">
                     {% for action in actions %}
                         <li class="d-flex gap-2"><span class="text-success fw-bold">•</span><span>{{ action }}</span></li>
@@ -26,7 +32,7 @@
 
 <section class="row g-4 mb-4">
     {% for card in cards %}
-        <div class="col-md-4">
+        <div class="col-sm-6 col-xl-3">
             <article class="metric-card tone-{{ card.tone }} p-4 h-100">
                 <div class="text-muted fw-semibold">{{ card.label }}</div>
                 <div class="metric-value my-3">{{ card.value }}</div>
@@ -39,11 +45,12 @@
 <section class="panel-card p-4">
     <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
         <div>
-            <h2 class="h5 fw-bold mb-1">Truy cập nhanh</h2>
-            <p class="text-muted mb-0">Mở ngay các phân hệ chính để quản lý sách, phiếu mượn trả và báo cáo hoạt động.</p>
+            <h2 class="h5 fw-bold mb-1">Tình hình vận hành</h2>
+            <p class="text-muted mb-0">Có {{ borrowed_count }} phiếu đang mượn, {{ overdue_count }} phiếu quá hạn và {{ student_count }} tài khoản sinh viên trong hệ thống.</p>
         </div>
         <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" href="{% url 'book-list' %}">Catalog</a>
+            <a class="btn btn-outline-secondary" href="{% url 'opac' %}">OPAC</a>
+            <a class="btn btn-outline-secondary" href="{% url 'book-list' %}">Danh mục</a>
             <a class="btn btn-brand" href="{% url 'loan-list' %}">Mượn trả</a>
         </div>
     </div>
