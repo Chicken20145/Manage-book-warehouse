@@ -156,7 +156,8 @@
             <a class="nav-link" href="{% url 'dashboard' %}">Tổng quan</a>
             <a class="nav-link" href="{% url 'book-list' %}">Danh mục sách</a>
             <a class="nav-link" href="{% url 'loan-list' %}">Mượn trả</a>
-            {% if user.is_authenticated and user.role == 'ADMIN' %}
+            {% if user.is_authenticated and user.role == 'ADMIN' or user.is_superuser %}
+                <a class="nav-link" href="{% url 'user-list' %}">Tài khoản</a>
                 <a class="nav-link" href="/admin/">Quản trị</a>
             {% endif %}
         </nav>
@@ -171,6 +172,7 @@
             <div class="d-flex align-items-center gap-3">
                 {% if user.is_authenticated %}
                     <span class="status-pill">{{ user.username }} - {{ user.role }}</span>
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'account-settings' %}">Cài đặt</a>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button class="btn btn-outline-secondary btn-sm" type="submit">Đăng xuất</button>

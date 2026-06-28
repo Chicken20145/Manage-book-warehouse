@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Cài đặt tài khoản | Book Warehouse{% endblock %}
+{% block page_heading %}Cài đặt tài khoản{% endblock %}
+
+{% block content %}
+<section class="page-hero p-4 mb-4">
+    <span class="status-pill">Account</span>
+    <h1 class="h3 fw-bold mt-3 mb-2">Thông tin cá nhân</h1>
+    <p class="text-muted mb-0">Cập nhật hồ sơ và đổi mật khẩu đăng nhập của bạn.</p>
+</section>
+
+<section class="row g-4">
+    <div class="col-lg-7">
+        <div class="data-card p-4">
+            <h2 class="h5 fw-bold mb-3">Hồ sơ</h2>
+            <form method="post" class="d-grid gap-3">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div>
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button class="btn btn-brand" type="submit">Lưu thay đổi</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card p-4">
+            <h2 class="h5 fw-bold mb-2">Bảo mật</h2>
+            <p class="text-muted">Đổi mật khẩu định kỳ để bảo vệ tài khoản.</p>
+            <a class="btn btn-outline-secondary" href="{% url 'password-change' %}">Đổi mật khẩu</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

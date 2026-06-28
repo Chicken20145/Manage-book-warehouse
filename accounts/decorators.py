@@ -13,7 +13,7 @@ def role_required(*allowed_roles):
                 return redirect('login')
                 
             # 2. Nếu đã đăng nhập và role nằm trong danh sách cho phép -> Cho đi tiếp
-            if request.user.role in allowed_roles:
+            if request.user.is_superuser or request.user.role in allowed_roles:
                 return view_func(request, *args, **kwargs)
                 
             # 3. Nếu sai quyền -> Báo lỗi 403 (Hoặc có thể redirect về trang báo lỗi riêng)

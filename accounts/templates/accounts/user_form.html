@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Sửa tài khoản | Book Warehouse{% endblock %}
+{% block page_heading %}Sửa tài khoản{% endblock %}
+
+{% block content %}
+<section class="data-card p-4 mx-auto" style="max-width: 760px;">
+    <h1 class="h4 fw-bold mb-1">{{ target_user.username }}</h1>
+    <p class="text-muted mb-4">Admin có thể thay đổi toàn bộ quyền và thông tin tài khoản này.</p>
+    <form method="post" class="row g-3">
+        {% csrf_token %}
+        {% for field in form %}
+            {% if field.field.widget.input_type == 'checkbox' %}
+                <div class="col-md-4">
+                    <div class="form-check mt-4">
+                        {{ field }}
+                        <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+            {% endif %}
+            {% for error in field.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        {% endfor %}
+        <div class="col-12 d-flex justify-content-end gap-2 border-top pt-3 mt-3">
+            <a class="btn btn-outline-secondary" href="{% url 'user-list' %}">Hủy</a>
+            <button class="btn btn-brand" type="submit">Lưu tài khoản</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
