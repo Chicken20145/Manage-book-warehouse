@@ -11,8 +11,8 @@ from circulation.models import Borrowing, BorrowedItem
 
 ROLE_LABELS = {
     'ADMIN': 'Quản trị viên',
-    'LIBRARIAN': 'Nhân viên',
-    'STUDENT': 'Khách hàng',
+    'LIBRARIAN': 'Thủ thư',
+    'STUDENT': 'Sinh viên',
 }
 
 
@@ -28,39 +28,39 @@ def dashboard_view(request):
             'note': 'Tổng số đầu sách đang được quản lý trong kho.',
         },
         {
-            'label': 'Đang cho thuê',
+            'label': 'Đang cho mượn',
             'value': Borrowing.objects.filter(status=Borrowing.Status.BORROWED).count(),
             'tone': 'warning',
-            'note': 'Phiếu thuê đang mở và chưa xác nhận trả.',
+            'note': 'Phiếu mượn đang mở và chưa xác nhận trả.',
         },
         {
-            'label': 'Khách hàng',
+            'label': 'Sinh viên',
             'value': student_count,
             'tone': 'success',
-            'note': 'Tài khoản khách hàng có thể thuê sách trong hệ thống.',
+            'note': 'Tài khoản sinh viên có thể mượn sách trong hệ thống.',
         },
         {
             'label': 'Quá hạn',
             'value': Borrowing.objects.filter(status=Borrowing.Status.OVERDUE).count(),
             'tone': 'danger',
-            'note': 'Phiếu cần nhân viên theo dõi và nhắc trả sách.',
+            'note': 'Phiếu cần thủ thư theo dõi và nhắc trả sách.',
         },
     ]
     actions_by_role = {
         'ADMIN': [
             'Kiểm tra tài khoản mới và phân quyền.',
-            'Duyệt thay đổi cấu hình hệ thống.',
+            'Kiểm tra cấu hình hệ thống và quyền truy cập.',
             'Theo dõi trạng thái các phân hệ trong dashboard.',
         ],
         'LIBRARIAN': [
             'Cập nhật danh mục sách và tình trạng tồn kho.',
-            'Xác nhận phiếu thuê/trả sách.',
-            'Theo dõi sách quá hạn cần nhắc khách hàng.',
+            'Xác nhận phiếu mượn/trả sách.',
+            'Theo dõi sách quá hạn cần nhắc sinh viên.',
         ],
         'STUDENT': [
             'Tìm sách trong kho.',
-            'Theo dõi sách đang thuê.',
-            'Xem lịch sử thuê/trả của bản thân.',
+            'Theo dõi sách đang mượn.',
+            'Xem lịch sử mượn/trả của bản thân.',
         ],
     }
     context = {
@@ -94,11 +94,11 @@ def statistics_view(request):
     )
     total_copies = active_agg['total'] or 0
     available_copies = active_agg['available'] or 0
-    rented_copies = total_copies - available_copies
+    borrowed_copies = total_copies - available_copies
 
     inactive_copies = Book.objects.filter(is_active=False).aggregate(total=Sum('total_copies'))['total'] or 0
 
-    # 2. Thống kê xu hướng thuê sách 7 ngày gần đây (Line Chart)
+    # 2. Thống kê xu hướng mượn sách 7 ngày gần đây (Line Chart)
     today = date.today()
     last_7_days = [today - timedelta(days=i) for i in range(6, -1, -1)]
     borrowings_by_day = Borrowing.objects.filter(
@@ -111,20 +111,20 @@ def statistics_view(request):
     for i, d in enumerate(last_7_days):
         day_data[i] = borrow_map.get(d, 0)
 
-    # 3. Top 5 sách thuê nhiều nhất
+    # 3. Top 5 sách mượn nhiều nhất
     top_books = BorrowedItem.objects.values('book__title', 'book__code')\
-        .annotate(rent_count=Count('id'))\
-        .order_by('-rent_count')[:5]
+        .annotate(borrow_count=Count('id'))\
+        .order_by('-borrow_count')[:5]
 
-    # 4. Top 5 khách hàng tích cực thuê sách nhất
+    # 4. Top 5 sinh viên mượn sách nhiều nhất
     top_renters = Borrowing.objects.values('user__username', 'user__student_id')\
-        .annotate(rent_count=Count('id'))\
-        .order_by('-rent_count')[:5]
+        .annotate(borrow_count=Count('id'))\
+        .order_by('-borrow_count')[:5]
 
     context = {
         'book_stats': {
             'available': available_copies,
-            'rented': rented_copies,
+            'borrowed': borrowed_copies,
             'inactive': inactive_copies,
         },
         'chart_trend': {

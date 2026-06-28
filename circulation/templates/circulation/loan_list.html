@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}Thuê trả | Book Warehouse{% endblock %}
-{% block page_heading %}Thuê trả sách{% endblock %}
+{% block title %}Mượn trả | Book Warehouse{% endblock %}
+{% block page_heading %}Mượn trả sách{% endblock %}
 
 {% block content %}
 <section class="page-hero p-4 mb-4">
     <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
         <div>
             <span class="status-pill">Circulation</span>
-            <h1 class="h3 fw-bold mt-3 mb-2">Theo dõi phiếu thuê và hạn trả</h1>
-            <p class="text-muted mb-0">Tạo phiếu gọn hơn, chọn khách hàng rõ hơn và nhìn ngay số tiền phạt nếu quá hạn.</p>
+            <h1 class="h3 fw-bold mt-3 mb-2">Theo dõi phiếu mượn và hạn trả</h1>
+            <p class="text-muted mb-0">Tạo phiếu gọn hơn, chọn sinh viên rõ hơn và nhìn ngay số tiền phạt nếu quá hạn.</p>
         </div>
         {% if user.role == 'ADMIN' or user.role == 'LIBRARIAN' %}
             <button class="btn btn-brand btn-lg px-4" type="button" data-bs-toggle="collapse" data-bs-target="#borrowForm">
-                + Tạo phiếu thuê
+                + Tạo phiếu mượn
             </button>
         {% endif %}
     </div>
@@ -23,8 +23,8 @@
 <section class="data-card p-4 mb-4 collapse show" id="borrowForm">
     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
         <div>
-            <h2 class="h5 fw-bold mb-1">Phiếu thuê mới</h2>
-            <p class="text-muted mb-0">Chọn đúng khách hàng, chọn sách đang còn trong kho và xác nhận khi đã kiểm tra xong.</p>
+            <h2 class="h5 fw-bold mb-1">Phiếu mượn mới</h2>
+            <p class="text-muted mb-0">Chọn đúng sinh viên, chọn sách đang còn trong kho và hệ thống tự tính hạn trả 14 ngày.</p>
         </div>
         <span class="badge text-bg-light border">Tối đa 5 cuốn</span>
     </div>
@@ -39,10 +39,6 @@
             <div class="col-lg-4">
                 <label class="form-label fw-semibold">{{ borrow_form.borrow_date.label }}</label>
                 {{ borrow_form.borrow_date }}
-            </div>
-            <div class="col-lg-4">
-                <label class="form-label fw-semibold">{{ borrow_form.due_date.label }}</label>
-                {{ borrow_form.due_date }}
             </div>
             <div class="col-12">
                 <label class="form-label fw-semibold">{{ borrow_form.notes.label }}</label>
@@ -69,7 +65,7 @@
                 </div>
             </div>
             <div class="col-12 d-flex flex-column flex-sm-row gap-2 align-items-sm-center justify-content-between">
-                <small class="text-muted">Thuê tối đa 5 cuốn. Nếu sách hết, sách đó sẽ không xuất hiện trong danh sách.</small>
+                <small class="text-muted">Mượn tối đa 5 cuốn. Nếu sách hết, sách đó sẽ không xuất hiện trong danh sách.</small>
                 <button class="btn btn-brand btn-lg px-4" type="submit">Xác nhận tạo phiếu</button>
             </div>
         </div>
@@ -90,7 +86,7 @@
         <table class="table align-middle mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>Khách hàng</th>
+                    <th>Sinh viên</th>
                     <th>Sách</th>
                     <th>Hạn trả</th>
                     <th>Tiền phạt</th>
@@ -142,7 +138,7 @@
                                     {% if loan.status == 'BORROWED' %}
                                         <form method="post" action="{% url 'borrow-confirm' loan.id %}">
                                             {% csrf_token %}
-                                            <button class="btn btn-sm btn-warning fw-semibold" type="submit">Xác nhận thuê</button>
+                                            <button class="btn btn-sm btn-warning fw-semibold" type="submit">Xác nhận mượn</button>
                                         </form>
                                     {% endif %}
                                     {% if loan.status == 'BORROWED' or loan.status == 'OVERDUE' %}
@@ -158,7 +154,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-5">Chưa có phiếu thuê nào.</td>
+                        <td colspan="7" class="text-center text-muted py-5">Chưa có phiếu mượn nào.</td>
                     </tr>
                 {% endfor %}
             </tbody>

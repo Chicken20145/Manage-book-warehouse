@@ -148,7 +148,7 @@
             <span class="brand-mark">BW</span>
             <span>
                 <span class="d-block fw-bold">Book Warehouse</span>
-                <small class="text-muted">Quản lý thuê sách</small>
+                <small class="text-muted">Quản lý thư viện</small>
             </span>
         </a>
 
@@ -156,7 +156,7 @@
             <a class="nav-link" href="{% url 'dashboard' %}">Tổng quan</a>
             <a class="nav-link" href="{% url 'opac' %}">Tra cứu sách (OPAC)</a>
             <a class="nav-link" href="{% url 'book-list' %}">Danh mục sách</a>
-            <a class="nav-link" href="{% url 'loan-list' %}">Thuê trả</a>
+            <a class="nav-link" href="{% url 'loan-list' %}">Mượn trả</a>
             {% if user.is_authenticated and user.role == 'ADMIN' or user.role == 'LIBRARIAN' or user.is_superuser %}
                 <a class="nav-link" href="{% url 'statistics' %}">Thống kê</a>
             {% endif %}
@@ -170,7 +170,7 @@
         <header class="topbar px-3 px-lg-4 py-3 d-flex justify-content-between align-items-center">
             <div>
                 <div class="fw-bold">{% block page_heading %}Hệ thống quản lý kho sách{% endblock %}</div>
-                <small class="text-muted">Nền tảng xác thực và phân quyền đã sẵn sàng để nhóm phát triển tiếp.</small>
+                <small class="text-muted">Quản lý kho sách, tài khoản và phiếu mượn trả trong một hệ thống.</small>
             </div>
             <div class="d-flex align-items-center gap-3">
                 {% if user.is_authenticated %}

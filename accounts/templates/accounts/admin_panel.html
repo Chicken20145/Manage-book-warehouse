@@ -8,11 +8,11 @@
     <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
         <div>
             <span class="status-pill">Quản trị</span>
-            <h1 class="h3 fw-bold mt-3 mb-2">Bảng điều phối dịch vụ thuê sách</h1>
-            <p class="text-muted mb-0">Quản trị viên có thể kiểm soát toàn bộ tài khoản khách hàng, nhân viên, phân quyền và cấu hình thông tin hệ thống.</p>
+            <h1 class="h3 fw-bold mt-3 mb-2">Bảng quản trị thư viện</h1>
+            <p class="text-muted mb-0">Quản trị viên có thể kiểm soát toàn bộ tài khoản sinh viên, thủ thư, phân quyền và cấu hình thông tin hệ thống.</p>
         </div>
         <form method="get" class="input-group" style="max-width: 360px;">
-            <input class="form-control" type="text" name="q" value="{{ query }}" placeholder="Tìm tên đăng nhập, email, mã khách...">
+            <input class="form-control" type="text" name="q" value="{{ query }}" placeholder="Tìm tên đăng nhập, email, mã sinh viên...">
             <button class="btn btn-brand" type="submit">Tìm kiếm</button>
         </form>
     </div>
@@ -29,16 +29,16 @@
     </div>
     <div class="col-md-3">
         <article class="metric-card tone-success p-3 text-center">
-            <div class="text-muted small fw-bold">KHÁCH HÀNG</div>
+            <div class="text-muted small fw-bold">SINH VIÊN</div>
             <div class="metric-value my-2 text-success">{{ stats.student }}</div>
-            <p class="text-muted small mb-0">Tài khoản thành viên thuê sách</p>
+            <p class="text-muted small mb-0">Tài khoản sinh viên mượn sách</p>
         </article>
     </div>
     <div class="col-md-3">
         <article class="metric-card tone-warning p-3 text-center">
-            <div class="text-muted small fw-bold">NHÂN VIÊN</div>
+            <div class="text-muted small fw-bold">THỦ THƯ</div>
             <div class="metric-value my-2 text-warning">{{ stats.librarian }}</div>
-            <p class="text-muted small mb-0">Nhân sự vận hành và cho thuê</p>
+            <p class="text-muted small mb-0">Nhân sự vận hành và quản lý mượn trả</p>
         </article>
     </div>
     <div class="col-md-3">
@@ -75,7 +75,7 @@
                         <tr>
                             <th>Tên đăng nhập</th>
                             <th>Email</th>
-                            <th>Mã khách hàng</th>
+                            <th>Mã sinh viên</th>
                             <th>Vai trò</th>
                             <th>Trạng thái</th>
                             <th>Quyền đặc biệt</th>

@@ -8,8 +8,8 @@
     <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
         <div>
             <span class="status-pill">Analytics</span>
-            <h1 class="h3 fw-bold mt-3 mb-2">Thống kê hoạt động kinh doanh thuê sách</h1>
-            <p class="text-muted mb-0">Theo dõi phân bổ sách, số lượng giao dịch và xu hướng khách hàng thuê sách.</p>
+            <h1 class="h3 fw-bold mt-3 mb-2">Thống kê hoạt động thư viện</h1>
+            <p class="text-muted mb-0">Theo dõi phân bổ sách, số lượng phiếu mượn và xu hướng sử dụng sách.</p>
         </div>
     </div>
 </section>
@@ -30,10 +30,10 @@
     <!-- Chart 2: Rental Trend (Line) -->
     <div class="col-lg-7">
         <div class="data-card p-4 h-100">
-            <h2 class="h5 fw-bold mb-1">Xu hướng giao dịch thuê sách</h2>
-            <p class="text-muted small mb-4">Số lượt tạo phiếu thuê mới trong 7 ngày gần đây.</p>
+            <h2 class="h5 fw-bold mb-1">Xu hướng mượn sách</h2>
+            <p class="text-muted small mb-4">Số lượt tạo phiếu mượn mới trong 7 ngày gần đây.</p>
             <div style="position: relative; height:280px; width:100%">
-                <canvas id="rentTrendChart"></canvas>
+                <canvas id="borrowTrendChart"></canvas>
             </div>
         </div>
     </div>
@@ -44,7 +44,7 @@
     <!-- List 1: Top Books -->
     <div class="col-lg-6">
         <div class="data-card p-4 h-100">
-            <h2 class="h5 fw-bold mb-3">Top 5 sách được thuê nhiều nhất</h2>
+            <h2 class="h5 fw-bold mb-3">Top 5 sách được mượn nhiều nhất</h2>
             <div class="table-responsive">
                 <table class="table align-middle mb-0 table-sm">
                     <thead class="table-light">
@@ -52,7 +52,7 @@
                             <th style="width: 50px;">#</th>
                             <th>Tên sách</th>
                             <th>Mã sách</th>
-                            <th class="text-end">Số lượt thuê</th>
+                            <th class="text-end">Số lượt mượn</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,10 +61,10 @@
                                 <td class="fw-bold text-muted">{{ forloop.counter }}</td>
                                 <td class="fw-semibold">{{ book.book__title }}</td>
                                 <td><code>{{ book.book__code }}</code></td>
-                                <td class="text-end fw-bold text-primary">{{ book.rent_count }}</td>
+                                <td class="text-end fw-bold text-primary">{{ book.borrow_count }}</td>
                             </tr>
                         {% empty %}
-                            <tr><td colspan="4" class="text-center text-muted py-4">Chưa phát sinh dữ liệu cho thuê.</td></tr>
+                            <tr><td colspan="4" class="text-center text-muted py-4">Chưa phát sinh dữ liệu mượn sách.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -75,15 +75,15 @@
     <!-- List 2: Top Renters -->
     <div class="col-lg-6">
         <div class="data-card p-4 h-100">
-            <h2 class="h5 fw-bold mb-3">Top 5 khách hàng tích cực nhất</h2>
+            <h2 class="h5 fw-bold mb-3">Top 5 sinh viên mượn sách nhiều nhất</h2>
             <div class="table-responsive">
                 <table class="table align-middle mb-0 table-sm">
                     <thead class="table-light">
                         <tr>
                             <th style="width: 50px;">#</th>
                             <th>Tên tài khoản</th>
-                            <th>Mã khách hàng</th>
-                            <th class="text-end">Số lần thuê</th>
+                            <th>Mã sinh viên</th>
+                            <th class="text-end">Số lần mượn</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -92,10 +92,10 @@
                                 <td class="fw-bold text-muted">{{ forloop.counter }}</td>
                                 <td class="fw-semibold">{{ renter.user__username }}</td>
                                 <td>{{ renter.user__student_id|default:"-" }}</td>
-                                <td class="text-end fw-bold text-success">{{ renter.rent_count }}</td>
+                                <td class="text-end fw-bold text-success">{{ renter.borrow_count }}</td>
                             </tr>
                         {% empty %}
-                            <tr><td colspan="4" class="text-center text-muted py-4">Chưa phát sinh dữ liệu khách hàng.</td></tr>
+                            <tr><td colspan="4" class="text-center text-muted py-4">Chưa phát sinh dữ liệu sinh viên.</td></tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -110,7 +110,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         // Data from backend
         const availableCopies = {{ book_stats.available }};
-        const rentedCopies = {{ book_stats.rented }};
+        const borrowedCopies = {{ book_stats.borrowed }};
         const inactiveCopies = {{ book_stats.inactive }};
         
         const trendLabels = {{ chart_trend.labels|safe }};
@@ -120,9 +120,9 @@
         new Chart(document.getElementById('bookDistChart'), {
             type: 'doughnut',
             data: {
-                labels: ['Sẵn sàng cho thuê', 'Đang cho thuê', 'Ngưng hoạt động (Lịch sử)'],
+                labels: ['Sẵn sàng cho mượn', 'Đang cho mượn', 'Ngưng sử dụng'],
                 datasets: [{
-                    data: [availableCopies, rentedCopies, inactiveCopies],
+                    data: [availableCopies, borrowedCopies, inactiveCopies],
                     backgroundColor: ['#2f9e44', '#1f7a8c', '#adb5bd'],
                     borderWidth: 2,
                     hoverOffset: 4
@@ -145,12 +145,12 @@
         });
 
         // 2. Rental Trend Chart
-        new Chart(document.getElementById('rentTrendChart'), {
+        new Chart(document.getElementById('borrowTrendChart'), {
             type: 'line',
             data: {
                 labels: trendLabels,
                 datasets: [{
-                    label: 'Số lượt thuê',
+                    label: 'Số lượt mượn',
                     data: trendData,
                     borderColor: '#1f7a8c',
                     backgroundColor: 'rgba(31, 122, 140, 0.15)',

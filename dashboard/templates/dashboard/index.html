@@ -8,15 +8,15 @@
     <div class="row align-items-center g-4">
         <div class="col-lg-8">
             <span class="status-pill">Vai trò: {{ role }}</span>
-            <h1 class="display-6 fw-bold mt-3 mb-3">Không gian điều phối kho sách và phân quyền người dùng.</h1>
-            <p class="lead text-muted mb-0">Bạn đang đăng nhập với quyền {{ role }}. Các phân hệ Catalog, Circulation và Dashboard có thể kế thừa layout này để phát triển tiếp.</p>
+            <h1 class="display-6 fw-bold mt-3 mb-3">Tổng quan vận hành kho sách và phân quyền người dùng.</h1>
+            <p class="lead text-muted mb-0">Theo dõi nhanh tình trạng sách, phiếu mượn trả, tài khoản và các việc cần xử lý theo vai trò của bạn.</p>
         </div>
         <div class="col-lg-4">
             <div class="panel-card p-4">
-                <div class="text-muted small text-uppercase fw-bold">Nhiệm vụ gần nhất</div>
+                <div class="text-muted small text-uppercase fw-bold">Việc cần chú ý</div>
                 <ul class="list-unstyled mt-3 mb-0 d-grid gap-2">
                     {% for action in actions %}
-                        <li class="d-flex gap-2"><span class="text-success fw-bold">OK</span><span>{{ action }}</span></li>
+                        <li class="d-flex gap-2"><span class="text-success fw-bold">•</span><span>{{ action }}</span></li>
                     {% endfor %}
                 </ul>
             </div>
@@ -39,12 +39,12 @@
 <section class="panel-card p-4">
     <div class="d-flex flex-column flex-md-row justify-content-between gap-3 align-items-md-center">
         <div>
-            <h2 class="h5 fw-bold mb-1">Trạng thái tích hợp nhóm</h2>
-            <p class="text-muted mb-0">Các bạn còn lại có thể nối model, view và template vào các module dưới đây.</p>
+            <h2 class="h5 fw-bold mb-1">Truy cập nhanh</h2>
+            <p class="text-muted mb-0">Mở ngay các phân hệ chính để quản lý sách, phiếu mượn trả và báo cáo hoạt động.</p>
         </div>
         <div class="d-flex gap-2">
             <a class="btn btn-outline-secondary" href="{% url 'book-list' %}">Catalog</a>
-            <a class="btn btn-brand" href="{% url 'loan-list' %}">Thuê trả</a>
+            <a class="btn btn-brand" href="{% url 'loan-list' %}">Mượn trả</a>
         </div>
     </div>
 </section>

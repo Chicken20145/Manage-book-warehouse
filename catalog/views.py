@@ -7,7 +7,7 @@ from .forms import BookForm
 
 # 1. HÀM KIỂM TRA PHÂN QUYỀN
 def is_admin_or_librarian(user):
-    # Kiểm tra theo role của nhóm bạn tự định nghĩa
+    # Chỉ quản trị viên và thủ thư được thao tác dữ liệu sách.
     return getattr(user, 'role', '') in ['ADMIN', 'LIBRARIAN'] or user.is_superuser
 
 # 2. XEM DANH SÁCH & TÌM KIẾM (Ai cũng xem được)
@@ -67,7 +67,7 @@ def book_delete_view(request, pk):
         if book.borrowed_items.exists():
             book.is_active = False
             book.save(update_fields=['is_active', 'updated_at'])
-            messages.warning(request, 'Sách đã có lịch sử thuê nên không bị xóa. Hệ thống đã chuyển sách sang trạng thái ngưng sử dụng.')
+            messages.warning(request, 'Sách đã có lịch sử mượn nên không bị xóa. Hệ thống đã chuyển sách sang trạng thái ngưng sử dụng.')
             return redirect('book-list')
         book.delete()
         messages.success(request, 'Đã xóa sách khỏi danh mục.')

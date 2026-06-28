@@ -14,14 +14,14 @@ class CustomUserCreationForm(UserCreationForm):
         labels = {
             'username': 'Tên đăng nhập',
             'email': 'Email',
-            'student_id': 'Mã khách hàng',
+            'student_id': 'Mã sinh viên',
             'password1': 'Mật khẩu',
             'password2': 'Nhập lại mật khẩu',
         }
         placeholders = {
             'username': 'vd: nguyenvana',
             'email': 'vd: ban@example.com',
-            'student_id': 'Mã định danh khách hàng (tùy chọn)',
+            'student_id': 'Mã sinh viên (tùy chọn)',
         }
         for name, field in self.fields.items():
             field.label = labels.get(name, field.label)
@@ -38,7 +38,7 @@ class ProfileUpdateForm(forms.ModelForm):
             'first_name': 'Tên',
             'last_name': 'Họ',
             'email': 'Email',
-            'student_id': 'Mã khách hàng',
+            'student_id': 'Mã sinh viên',
         }
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -58,7 +58,7 @@ class AdminUserUpdateForm(forms.ModelForm):
             'last_name': 'Họ',
             'email': 'Email',
             'role': 'Vai trò',
-            'student_id': 'Mã khách hàng',
+            'student_id': 'Mã sinh viên',
             'is_active': 'Đang hoạt động',
             'is_staff': 'Có quyền staff',
             'is_superuser': 'Toàn quyền hệ thống',
