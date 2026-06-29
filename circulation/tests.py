@@ -164,3 +164,38 @@ class CirculationFlowTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, self.book.title)
+
+    def test_student_does_not_see_fine_payment_action(self):
+        borrowing = Borrowing.objects.create(
+            user=self.student,
+            borrow_date=date.today() - timedelta(days=20),
+            due_date=date.today() - timedelta(days=6),
+            status=Borrowing.Status.OVERDUE,
+            fine=30000,
+            is_fine_paid=False,
+        )
+
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('loan-list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Chưa thanh toán')
+        self.assertNotContains(response, reverse('fine-confirm', args=[borrowing.pk]))
+        self.assertNotContains(response, 'Ghi nhận thu phạt')
+
+    def test_librarian_sees_fine_payment_action(self):
+        borrowing = Borrowing.objects.create(
+            user=self.student,
+            borrow_date=date.today() - timedelta(days=20),
+            due_date=date.today() - timedelta(days=6),
+            status=Borrowing.Status.OVERDUE,
+            fine=30000,
+            is_fine_paid=False,
+        )
+
+        self.client.force_login(self.librarian)
+        response = self.client.get(reverse('loan-list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse('fine-confirm', args=[borrowing.pk]))
+        self.assertContains(response, 'Ghi nhận thu phạt')

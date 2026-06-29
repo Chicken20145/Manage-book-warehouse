@@ -120,11 +120,13 @@
                             {% if loan.current_fine > 0 %}
                                 {% if loan.is_fine_paid %}
                                     <span class="badge text-bg-success">Đã thu phạt</span>
-                                {% else %}
+                                {% elif user.role == 'ADMIN' or user.role == 'LIBRARIAN' %}
                                     <form method="post" action="{% url 'fine-confirm' loan.id %}">
                                         {% csrf_token %}
-                                        <button class="btn btn-sm btn-outline-danger fw-semibold" type="submit">Đã thu phạt</button>
+                                        <button class="btn btn-sm btn-outline-danger fw-semibold" type="submit">Ghi nhận thu phạt</button>
                                     </form>
+                                {% else %}
+                                    <span class="badge text-bg-warning">Chưa thanh toán</span>
                                 {% endif %}
                             {% else %}
                                 <span class="text-muted">Không có</span>
