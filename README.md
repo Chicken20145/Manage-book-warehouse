@@ -204,3 +204,7 @@ Các nhóm test hiện tập trung vào:
 - Nếu thay đổi model cần chạy `makemigrations`, sau đó cả nhóm chạy `migrate`.
 - Trước khi push nên chạy `manage.py check` và `manage.py test`.
 - Khi có xung đột migration hoặc database local, báo nhóm trước khi sửa để tránh làm lệch schema.
+
+## Trạng thái hoàn thiện
+
+Dự án đã hoàn thiện các chức năng chính phục vụ báo cáo và demo cuối kỳ: xác thực người dùng, phân quyền theo vai trò, quản lý danh mục sách, tra cứu OPAC, mượn/trả sách, theo dõi quá hạn, ghi nhận tiền phạt, thống kê tổng quan và dữ liệu mẫu. README này là tài liệu tổng hợp để giảng viên có thể nắm nhanh phạm vi, cách chạy và cấu trúc của hệ thống.
