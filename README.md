@@ -2,6 +2,8 @@
 
 Book Warehouse là website quản lý thư viện được xây dựng bằng Django. Dự án hỗ trợ quản lý tài khoản theo vai trò, quản lý kho sách, tra cứu sách, tạo phiếu mượn/trả, theo dõi sách quá hạn và ghi nhận tiền phạt.
 
+README này được dùng như tài liệu đọc nhanh cho giảng viên hoặc thành viên mới của nhóm. Nội dung bên dưới giới thiệu dự án làm gì, có những chức năng nào, cách chạy hệ thống, tài khoản demo và ý nghĩa của các thư mục/file chính trong mã nguồn.
+
 ## Mục tiêu dự án
 
 - Xây dựng hệ thống thư viện chạy được trên môi trường web.
@@ -121,45 +123,48 @@ Sau khi chạy `load_sample_data`, có thể dùng các tài khoản sau để d
 | Thủ thư | `librarian` | `lib123` | Quản lý sách và nghiệp vụ mượn/trả |
 | Sinh viên | `student01` | `stu123` | Tra cứu sách và xem phiếu mượn cá nhân |
 
-## Cấu trúc thư mục và file
+## Mô tả thư mục và file chính
 
-| Đường dẫn | Mô tả |
+Bảng này giải thích vai trò của từng phần trong mã nguồn để người đọc có thể hiểu nhanh dự án được chia module như thế nào và mỗi file đang phục vụ chức năng gì.
+
+| Đường dẫn | File/thư mục này dùng để làm gì |
 | --- | --- |
-| `manage.py` | File lệnh chính của Django, dùng để chạy migrate, test, server và command dữ liệu mẫu. |
-| `requirements.txt` | Danh sách thư viện Python cần cài đặt cho dự án. |
-| `.env` | File cấu hình môi trường local như `SECRET_KEY`, `DEBUG`; không đưa lên Git. |
-| `.gitignore` | Quy định các file/thư mục local không cần đưa lên repository. |
-| `db.sqlite3` | Database SQLite dùng khi chạy local. |
-| `core/` | Cấu hình lõi của Django project. |
-| `core/settings.py` | Cấu hình app, database, template, timezone, đăng nhập và email backend. |
-| `core/urls.py` | Khai báo URL tổng, kết nối các app `accounts`, `dashboard`, `catalog`, `circulation`. |
-| `core/asgi.py`, `core/wsgi.py` | Điểm khởi chạy ứng dụng khi deploy theo ASGI/WSGI. |
-| `accounts/` | App quản lý người dùng, xác thực và phân quyền. |
-| `accounts/models.py` | Định nghĩa `CustomUser` với vai trò `ADMIN`, `LIBRARIAN`, `STUDENT`. |
-| `accounts/forms.py` | Form đăng ký, chỉnh tài khoản, đổi mật khẩu và đặt lại mật khẩu. |
-| `accounts/views.py` | Xử lý đăng ký, cài đặt tài khoản, admin panel, chỉnh người dùng. |
-| `accounts/decorators.py` | Decorator kiểm tra quyền truy cập theo vai trò. |
-| `accounts/templates/accounts/` | Giao diện đăng nhập, đăng ký, quên mật khẩu, cài đặt và quản trị tài khoản. |
-| `catalog/` | App quản lý danh mục sách. |
-| `catalog/models.py` | Model `Book`, lưu mã sách, tên sách, tác giả, ISBN, số lượng và trạng thái hoạt động. |
-| `catalog/forms.py` | Form thêm/sửa sách và validate số lượng sách. |
-| `catalog/views.py` | Xử lý danh sách sách, tìm kiếm, thêm, sửa và ngưng sử dụng/xóa sách. |
-| `catalog/templates/catalog/` | Giao diện danh mục sách, form sách và xác nhận xóa/ngưng sử dụng. |
-| `circulation/` | App xử lý nghiệp vụ mượn trả. |
-| `circulation/models.py` | Model `Borrowing` và `BorrowedItem`, lưu phiếu mượn, sách mượn, hạn trả và tiền phạt. |
-| `circulation/forms.py` | Form tạo phiếu mượn và xác nhận ngày trả. |
-| `circulation/views.py` | Xử lý tạo phiếu, xác nhận mượn, xác nhận trả và ghi nhận thu phạt. |
-| `circulation/templates/circulation/` | Giao diện quản lý phiếu mượn/trả và trạng thái tiền phạt. |
-| `circulation/management/commands/load_sample_data.py` | Command tạo tài khoản demo, sách mẫu và phiếu mượn mẫu. |
-| `dashboard/` | App hiển thị tổng quan, OPAC và thống kê. |
-| `dashboard/views.py` | Tính số liệu tổng quan, lọc dữ liệu OPAC và thống kê hệ thống. |
-| `dashboard/templates/dashboard/` | Giao diện dashboard, tra cứu sách OPAC và thống kê. |
-| `templates/base.html` | Layout gốc dùng chung cho toàn bộ giao diện. |
-| `data/book_warehouse_sample_data.xlsx` | File Excel dữ liệu mẫu phục vụ báo cáo hoặc nhập liệu tham khảo. |
-| `*/migrations/` | Lịch sử thay đổi database schema của từng app. |
-| `*/tests.py` | Test tự động cho các chức năng chính của từng app. |
-| `output/` | Thư mục xuất tài liệu/báo cáo local, không cần đưa lên Git. |
-| `venv/` | Môi trường ảo Python local, không đưa lên Git. |
+| `README.md` | Tài liệu giới thiệu tổng quan dự án cho giảng viên và thành viên nhóm: chức năng, cách chạy, tài khoản demo và cấu trúc mã nguồn. |
+| `manage.py` | File lệnh trung tâm của Django. Dùng để chạy server, tạo/cập nhật database, chạy test và gọi các lệnh quản lý dữ liệu mẫu. |
+| `requirements.txt` | Danh sách thư viện Python cần cài để dự án chạy đúng trên máy khác. |
+| `.env` | File cấu hình riêng của từng máy, ví dụ `SECRET_KEY` và `DEBUG`. File này không nên đưa lên Git vì có thể chứa thông tin nhạy cảm. |
+| `.gitignore` | Danh sách file/thư mục không cần hoặc không nên push lên GitHub, ví dụ môi trường ảo, cache, file cấu hình local và tài liệu xuất tạm. |
+| `db.sqlite3` | Database SQLite dùng cho chạy thử local. File này lưu dữ liệu demo, tài khoản, sách và phiếu mượn trên máy đang chạy dự án. |
+| `core/` | Phần cấu hình gốc của toàn bộ website Django. Có thể hiểu đây là nơi nối các module chức năng lại thành một hệ thống hoàn chỉnh. |
+| `core/settings.py` | Khai báo cấu hình chính của dự án: app nào được bật, dùng database nào, template ở đâu, timezone, đăng nhập và email reset mật khẩu. |
+| `core/urls.py` | Bản đồ đường dẫn cấp cao của website. File này điều hướng người dùng tới các module như tài khoản, dashboard, danh mục sách và mượn trả. |
+| `core/asgi.py`, `core/wsgi.py` | File khởi chạy khi triển khai website lên server thật. Trong demo local thường không cần chỉnh trực tiếp. |
+| `accounts/` | Module tài khoản và phân quyền. Phần này quyết định ai được đăng nhập, ai là Admin, Thủ thư hoặc Sinh viên, và mỗi vai trò được làm gì. |
+| `accounts/models.py` | Định nghĩa bảng người dùng `CustomUser`, bổ sung vai trò và mã sinh viên để phục vụ phân quyền trong hệ thống thư viện. |
+| `accounts/forms.py` | Chứa các form liên quan đến tài khoản như đăng ký, chỉnh thông tin cá nhân, đổi mật khẩu và reset mật khẩu. |
+| `accounts/views.py` | Xử lý logic cho các màn hình tài khoản: đăng ký, cài đặt tài khoản, danh sách người dùng, sửa vai trò và đặt lại mật khẩu cho tài khoản khác. |
+| `accounts/decorators.py` | Chứa hàm kiểm tra quyền theo vai trò. Ví dụ chỉ Admin mới vào được trang quản trị tài khoản. |
+| `accounts/templates/accounts/` | Các trang giao diện của phần tài khoản: đăng nhập, đăng ký, quên mật khẩu, đổi mật khẩu, cài đặt tài khoản và quản trị người dùng. |
+| `catalog/` | Module quản lý kho sách. Phần này chịu trách nhiệm lưu thông tin sách, tìm kiếm sách và kiểm soát sách còn được sử dụng hay không. |
+| `catalog/models.py` | Định nghĩa bảng sách `Book`, gồm mã sách, tên sách, tác giả, ISBN, tổng số bản, số bản còn lại và trạng thái hoạt động. |
+| `catalog/forms.py` | Form nhập liệu cho chức năng thêm/sửa sách, đồng thời kiểm tra dữ liệu số lượng để tránh nhập sai. |
+| `catalog/views.py` | Xử lý các thao tác danh mục sách: xem danh sách, tìm kiếm, thêm sách, sửa sách và ngưng sử dụng/xóa sách theo điều kiện. |
+| `catalog/templates/catalog/` | Các màn hình của module sách: danh sách sách, form thêm/sửa và trang xác nhận trước khi xóa hoặc ngưng sử dụng sách. |
+| `circulation/` | Module nghiệp vụ mượn trả. Đây là phần mô phỏng quy trình thư viện thực tế: lập phiếu mượn, trả sách, quá hạn và thu phạt. |
+| `circulation/models.py` | Định nghĩa bảng phiếu mượn `Borrowing` và chi tiết sách mượn `BorrowedItem`, bao gồm hạn trả, ngày trả, trạng thái và tiền phạt. |
+| `circulation/forms.py` | Form tạo phiếu mượn và nhập ngày trả sách, giúp thủ thư thao tác nhanh trong giao diện mượn trả. |
+| `circulation/views.py` | Xử lý các nghiệp vụ chính: tạo phiếu mượn, xác nhận mượn, xác nhận trả, tự cập nhật tồn kho và ghi nhận thu phạt. |
+| `circulation/templates/circulation/` | Giao diện theo dõi phiếu mượn/trả, hiển thị trạng thái phiếu, tiền phạt và các nút thao tác theo đúng quyền người dùng. |
+| `circulation/management/commands/load_sample_data.py` | Lệnh tạo dữ liệu demo gồm tài khoản mẫu, sách mẫu và phiếu mượn mẫu để nhóm có thể trình bày dự án ngay sau khi cài đặt. |
+| `dashboard/` | Module trang chủ, tra cứu OPAC và thống kê. Đây là nơi người dùng nhìn tổng quan tình hình thư viện. |
+| `dashboard/views.py` | Tính toán số liệu cho dashboard, xử lý tra cứu sách ở OPAC và chuẩn bị dữ liệu cho trang thống kê. |
+| `dashboard/templates/dashboard/` | Giao diện trang tổng quan, trang tra cứu sách OPAC và trang thống kê vận hành. |
+| `templates/base.html` | Layout chung của toàn website, gồm sidebar, thanh trên, vùng nội dung, style tổng quát và các thành phần dùng lại ở nhiều trang. |
+| `data/book_warehouse_sample_data.xlsx` | File Excel dữ liệu mẫu dùng để tham khảo khi làm báo cáo hoặc khi cần minh họa nguồn dữ liệu sách. |
+| `*/migrations/` | Các file ghi lại lịch sử thay đổi cấu trúc database của từng module. Khi chạy `migrate`, Django dùng các file này để tạo bảng. |
+| `*/tests.py` | Test tự động kiểm tra những chức năng quan trọng, giúp nhóm biết hệ thống còn chạy đúng sau khi sửa code. |
+| `output/` | Thư mục xuất báo cáo/tài liệu local trong quá trình làm bài. Đây không phải mã nguồn chính nên không cần đưa lên GitHub. |
+| `venv/` | Môi trường ảo Python trên máy local. Thư mục này giúp cài thư viện riêng cho dự án nhưng không đưa lên GitHub. |
 
 ## Kiểm thử
 
