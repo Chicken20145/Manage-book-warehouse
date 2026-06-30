@@ -11,3 +11,6 @@ __pycache__/
 
 # Bỏ qua bộ nhớ tạm của Visual Studio
 .vs/
+
+# Bỏ qua tài liệu/báo cáo xuất tạm khi làm bài
+output/
