@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 
 from accounts.decorators import role_required
 from catalog.models import Book
-from .forms import BorrowingForm, ReturnForm
+from .forms import BorrowingForm, BorrowRequestForm, ReturnForm
 from .models import BorrowedItem, Borrowing
 
 
@@ -40,6 +40,7 @@ def loan_list_view(request):
     context = {
         'loans': borrowings,
         'borrow_form': BorrowingForm(),
+        'request_form': BorrowRequestForm(),
         'return_form': ReturnForm(),
         'fine_status': fine_status,
     }
@@ -85,6 +86,44 @@ def create_borrowing_view(request):
     return redirect('loan-list')
 
 
+@login_required
+@require_POST
+def request_borrowing_view(request):
+    if _is_staff_librarian(request.user):
+        messages.error(request, 'Admin và thủ thư hãy tạo phiếu mượn trực tiếp trong biểu mẫu nghiệp vụ.')
+        return redirect('loan-list')
+
+    form = BorrowRequestForm(request.POST)
+    if form.is_valid():
+        books = list(form.cleaned_data['books'])
+        borrow_date = timezone.localdate()
+        due_date = borrow_date + timedelta(days=14)
+        try:
+            with transaction.atomic():
+                locked_books = []
+                for book in books:
+                    locked_book = Book.objects.select_for_update().get(pk=book.pk)
+                    if not locked_book.is_active or locked_book.available_copies < 1:
+                        raise ValueError(f'Sách "{locked_book.title}" hiện không còn khả dụng để yêu cầu mượn.')
+                    locked_books.append(locked_book)
+                borrowing = Borrowing.objects.create(
+                    user=request.user,
+                    borrow_date=borrow_date,
+                    due_date=due_date,
+                    status=Borrowing.Status.REQUESTED,
+                    notes=form.cleaned_data.get('notes', ''),
+                )
+                for book in locked_books:
+                    BorrowedItem.objects.create(borrowing=borrowing, book=book, quantity=1)
+        except ValueError as exc:
+            messages.error(request, str(exc))
+            return redirect('loan-list')
+        messages.success(request, 'Đã gửi yêu cầu mượn sách. Vui lòng chờ Admin hoặc Thủ thư duyệt.')
+    else:
+        messages.error(request, 'Không thể gửi yêu cầu mượn. Vui lòng chọn từ 1 đến 5 sách còn khả dụng.')
+    return redirect('loan-list')
+
+
 @role_required('ADMIN', 'LIBRARIAN')
 @require_POST
 def confirm_return_view(request, borrowing_id):
@@ -114,13 +153,29 @@ def confirm_return_view(request, borrowing_id):
 @role_required('ADMIN', 'LIBRARIAN')
 @require_POST
 def confirm_borrowing_view(request, borrowing_id):
-    borrowing = get_object_or_404(Borrowing, pk=borrowing_id)
-    if borrowing.status != Borrowing.Status.BORROWED:
-        messages.error(request, 'Chỉ có thể xác nhận mượn với phiếu đang mượn.')
-        return redirect('loan-list')
-    borrowing.confirmed_by = request.user
-    borrowing.confirmed_at = timezone.now()
-    borrowing.save(update_fields=['confirmed_by', 'confirmed_at', 'updated_at'])
+    with transaction.atomic():
+        borrowing = Borrowing.objects.select_for_update().prefetch_related('items__book').get(pk=borrowing_id)
+        if borrowing.status == Borrowing.Status.REQUESTED:
+            for item in borrowing.items.select_related('book'):
+                book = Book.objects.select_for_update().get(pk=item.book_id)
+                if not book.is_active or book.available_copies < item.quantity:
+                    messages.error(request, f'Sách "{book.title}" hiện không đủ số lượng để duyệt yêu cầu.')
+                    return redirect('loan-list')
+                book.available_copies -= item.quantity
+                book.save(update_fields=['available_copies', 'updated_at'])
+            borrowing.status = Borrowing.Status.BORROWED
+            borrowing.confirmed_by = request.user
+            borrowing.confirmed_at = timezone.now()
+            borrowing.save(update_fields=['status', 'confirmed_by', 'confirmed_at', 'updated_at'])
+            messages.success(request, 'Đã duyệt yêu cầu mượn và cập nhật tồn kho.')
+            return redirect('loan-list')
+
+        if borrowing.status != Borrowing.Status.BORROWED:
+            messages.error(request, 'Chỉ có thể xác nhận với phiếu chờ duyệt hoặc đang mượn.')
+            return redirect('loan-list')
+        borrowing.confirmed_by = request.user
+        borrowing.confirmed_at = timezone.now()
+        borrowing.save(update_fields=['confirmed_by', 'confirmed_at', 'updated_at'])
     messages.success(request, 'Đã xác nhận phiếu mượn.')
     return redirect('loan-list')
 

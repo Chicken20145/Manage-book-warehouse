@@ -69,6 +69,82 @@ class CirculationFlowTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertFalse(Borrowing.objects.exists())
 
+    def test_student_can_request_borrowing_without_decreasing_stock(self):
+        self.client.force_login(self.student)
+        response = self.client.post(reverse('borrow-request'), {
+            'books': [self.book.pk],
+            'notes': 'Em muốn mượn sách này.',
+        })
+
+        self.assertRedirects(response, reverse('loan-list'))
+        borrowing = Borrowing.objects.get(user=self.student)
+        self.book.refresh_from_db()
+        self.assertEqual(borrowing.status, Borrowing.Status.REQUESTED)
+        self.assertIsNone(borrowing.confirmed_by)
+        self.assertEqual(borrowing.items.count(), 1)
+        self.assertEqual(self.book.available_copies, 3)
+
+    def test_student_cannot_request_unavailable_book(self):
+        self.book.available_copies = 0
+        self.book.save(update_fields=['available_copies', 'updated_at'])
+
+        self.client.force_login(self.student)
+        response = self.client.post(reverse('borrow-request'), {
+            'books': [self.book.pk],
+            'notes': 'Cố yêu cầu sách đã hết.',
+        })
+
+        self.assertRedirects(response, reverse('loan-list'))
+        self.assertFalse(Borrowing.objects.exists())
+
+    def test_unavailable_book_is_hidden_from_student_request_form(self):
+        self.book.available_copies = 0
+        self.book.save(update_fields=['available_copies', 'updated_at'])
+
+        self.client.force_login(self.student)
+        response = self.client.get(reverse('loan-list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, self.book.title)
+
+    def test_librarian_can_approve_request_and_decrease_stock(self):
+        borrowing = Borrowing.objects.create(
+            user=self.student,
+            borrow_date=date.today(),
+            due_date=date.today() + timedelta(days=14),
+            status=Borrowing.Status.REQUESTED,
+            notes='Student request',
+        )
+        BorrowedItem.objects.create(borrowing=borrowing, book=self.book, quantity=1)
+
+        self.client.force_login(self.librarian)
+        response = self.client.post(reverse('borrow-confirm', args=[borrowing.pk]))
+
+        self.assertRedirects(response, reverse('loan-list'))
+        borrowing.refresh_from_db()
+        self.book.refresh_from_db()
+        self.assertEqual(borrowing.status, Borrowing.Status.BORROWED)
+        self.assertEqual(borrowing.confirmed_by, self.librarian)
+        self.assertEqual(self.book.available_copies, 2)
+
+    def test_student_cannot_approve_borrow_request(self):
+        borrowing = Borrowing.objects.create(
+            user=self.student,
+            borrow_date=date.today(),
+            due_date=date.today() + timedelta(days=14),
+            status=Borrowing.Status.REQUESTED,
+        )
+        BorrowedItem.objects.create(borrowing=borrowing, book=self.book, quantity=1)
+
+        self.client.force_login(self.student)
+        response = self.client.post(reverse('borrow-confirm', args=[borrowing.pk]))
+
+        self.assertEqual(response.status_code, 403)
+        borrowing.refresh_from_db()
+        self.book.refresh_from_db()
+        self.assertEqual(borrowing.status, Borrowing.Status.REQUESTED)
+        self.assertEqual(self.book.available_copies, 3)
+
     def test_librarian_can_confirm_return_and_restore_stock(self):
         borrowing = Borrowing.objects.create(
             user=self.student,

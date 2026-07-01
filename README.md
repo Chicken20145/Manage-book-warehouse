@@ -46,6 +46,9 @@ README này được dùng như tài liệu đọc nhanh cho giảng viên hoặ
 
 ### 3. Mượn trả sách
 
+- Sinh viên có thể gửi yêu cầu mượn sách nếu sách còn khả dụng.
+- Yêu cầu mượn ở trạng thái `Chờ duyệt` và chưa trừ số lượng sách trong kho.
+- Admin hoặc Thủ thư duyệt yêu cầu thì hệ thống mới chuyển phiếu sang `Đang mượn`.
 - Tạo phiếu mượn cho sinh viên.
 - Tự động giảm số lượng sách còn khả dụng khi tạo phiếu.
 - Xác nhận trả sách và tự động hoàn lại số lượng sách vào kho.

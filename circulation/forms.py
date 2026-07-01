@@ -40,5 +40,29 @@ class BorrowingForm(forms.ModelForm):
         return books
 
 
+class BorrowRequestForm(forms.Form):
+    books = forms.ModelMultipleChoiceField(
+        queryset=Book.objects.none(),
+        widget=forms.CheckboxSelectMultiple,
+        label='Chọn sách muốn mượn',
+    )
+    notes = forms.CharField(
+        required=False,
+        label='Ghi chú',
+        widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Ví dụ: em cần mượn sách cho môn học...'}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['books'].queryset = Book.objects.filter(is_active=True, available_copies__gt=0)
+        self.fields['books'].widget.attrs.update({'class': 'form-check-input'})
+
+    def clean_books(self):
+        books = self.cleaned_data['books']
+        if len(books) > 5:
+            raise forms.ValidationError('Chỉ được yêu cầu mượn tối đa 5 cuốn sách cùng lúc.')
+        return books
+
+
 class ReturnForm(forms.Form):
     returned_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
