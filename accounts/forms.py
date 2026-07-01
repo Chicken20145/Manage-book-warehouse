@@ -75,6 +75,12 @@ class AdminUserUpdateForm(forms.ModelForm):
             'is_superuser': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        self.actor = kwargs.pop('actor', None)
+        super().__init__(*args, **kwargs)
+        if not getattr(self.actor, 'is_superuser', False):
+            self.fields.pop('is_superuser', None)
+
 
 class AdminPasswordResetForm(SetPasswordForm):
     def __init__(self, *args, **kwargs):

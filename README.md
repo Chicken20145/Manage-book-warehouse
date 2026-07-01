@@ -31,6 +31,7 @@ README này được dùng như tài liệu đọc nhanh cho giảng viên hoặ
 - Quên mật khẩu và đặt lại mật khẩu qua console email backend.
 - Cài đặt tài khoản và đổi mật khẩu.
 - Quản trị viên có quyền quản lý tài khoản, chỉnh vai trò và đặt lại mật khẩu người dùng.
+- Tài khoản toàn quyền `superuser` là cấp cao nhất; Admin thường không được sửa hoặc đặt lại mật khẩu tài khoản toàn quyền.
 - Phân quyền theo 3 vai trò:
   - `ADMIN`: quản trị toàn hệ thống.
   - `LIBRARIAN`: quản lý sách và phiếu mượn/trả.
@@ -119,7 +120,7 @@ Sau khi chạy `load_sample_data`, có thể dùng các tài khoản sau để d
 
 | Vai trò | Tài khoản | Mật khẩu | Mục đích |
 | --- | --- | --- | --- |
-| Quản trị viên | `admin_demo` | `admin123` | Quản lý tài khoản, sách, phiếu mượn/trả và thu phạt |
+| Quản trị viên toàn quyền | `admin_demo` | `admin123` | Tài khoản cấp cao nhất, quản lý tài khoản, sách, phiếu mượn/trả và thu phạt |
 | Thủ thư | `librarian` | `lib123` | Quản lý sách và nghiệp vụ mượn/trả |
 | Sinh viên | `student01` | `stu123` | Tra cứu sách và xem phiếu mượn cá nhân |
 

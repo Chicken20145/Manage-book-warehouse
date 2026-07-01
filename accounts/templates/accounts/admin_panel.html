@@ -111,8 +111,12 @@
                                 </td>
                                 <td>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <a class="btn btn-sm btn-brand" href="{% url 'user-update' account.pk %}">Sửa vai trò</a>
-                                        <a class="btn btn-sm btn-outline-danger" href="{% url 'user-password-reset' account.pk %}">Đặt mật khẩu</a>
+                                        {% if user.is_superuser or not account.is_superuser %}
+                                            <a class="btn btn-sm btn-brand" href="{% url 'user-update' account.pk %}">Sửa vai trò</a>
+                                            <a class="btn btn-sm btn-outline-danger" href="{% url 'user-password-reset' account.pk %}">Đặt mật khẩu</a>
+                                        {% else %}
+                                            <span class="badge text-bg-light border">Tài khoản cấp cao</span>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>

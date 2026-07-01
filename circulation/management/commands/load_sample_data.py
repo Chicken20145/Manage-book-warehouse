@@ -34,7 +34,7 @@ BOOKS = [
 
 USERS = [
     {'username': 'librarian', 'password': 'lib123', 'role': 'LIBRARIAN', 'email': 'librarian@library.local', 'is_staff': True},
-    {'username': 'admin_demo', 'password': 'admin123', 'role': 'ADMIN', 'email': 'admin@library.local', 'is_staff': True},
+    {'username': 'admin_demo', 'password': 'admin123', 'role': 'ADMIN', 'email': 'admin@library.local', 'is_staff': True, 'is_superuser': True},
     {'username': 'student01', 'password': 'stu123', 'role': 'STUDENT', 'student_id': 'SV001', 'email': 'student01@library.local'},
     {'username': 'student02', 'password': 'stu123', 'role': 'STUDENT', 'student_id': 'SV002', 'email': 'student02@library.local'},
     {'username': 'student03', 'password': 'stu123', 'role': 'STUDENT', 'student_id': 'SV003', 'email': 'student03@library.local'},
@@ -74,6 +74,7 @@ class Command(BaseCommand):
             user.email = data.get('email', '')
             user.student_id = data.get('student_id')
             user.is_staff = data.get('is_staff', False)
+            user.is_superuser = data.get('is_superuser', False)
             user.set_password(data['password'])
             user.save()
             users[user.username] = user

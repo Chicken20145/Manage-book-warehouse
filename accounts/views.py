@@ -5,12 +5,19 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordChangeView
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 
 from .decorators import role_required
 from .forms import AdminPasswordResetForm, AdminUserUpdateForm, CustomUserCreationForm, ProfileUpdateForm, StyledPasswordChangeForm
 from .models import CustomUser
+
+
+def _can_manage_account(actor, target_user):
+    if getattr(actor, 'is_superuser', False):
+        return True
+    return not target_user.is_superuser
 
 
 def register_view(request):
@@ -94,20 +101,24 @@ def admin_panel_view(request):
 @role_required('ADMIN')
 def user_update_view(request, pk):
     target_user = get_object_or_404(CustomUser, pk=pk)
+    if not _can_manage_account(request.user, target_user):
+        raise PermissionDenied
     if request.method == 'POST':
-        form = AdminUserUpdateForm(request.POST, instance=target_user)
+        form = AdminUserUpdateForm(request.POST, instance=target_user, actor=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Đã cập nhật tài khoản.')
             return redirect('admin-panel')
     else:
-        form = AdminUserUpdateForm(instance=target_user)
+        form = AdminUserUpdateForm(instance=target_user, actor=request.user)
     return render(request, 'accounts/user_form.html', {'form': form, 'target_user': target_user})
 
 
 @role_required('ADMIN')
 def user_password_reset_view(request, pk):
     target_user = get_object_or_404(CustomUser, pk=pk)
+    if not _can_manage_account(request.user, target_user):
+        raise PermissionDenied
     if request.method == 'POST':
         form = AdminPasswordResetForm(target_user, request.POST)
         if form.is_valid():
